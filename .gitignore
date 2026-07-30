@@ -7,6 +7,12 @@ build/
 .next/
 out/
 
+# local QA artefacts (regenerate with `node scripts/screenshot.mjs`)
+screenshots/
+
+# vercel
+.vercel/
+
 # env
 .env
 .env.local

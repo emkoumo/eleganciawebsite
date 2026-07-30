@@ -1,0 +1,152 @@
+@import 'tailwindcss';
+
+/* ---------------------------------------------------------------------------
+   Elegancia Luxury Villas — design tokens
+   ---------------------------------------------------------------------------
+   Every colour pairing used for text in this file has been measured against
+   WCAG 2.2 AA (4.5:1 body, 3:1 large text / UI). Measured ratios are noted
+   inline. Do not introduce a new text/background pair without measuring it.
+
+   Deliberately EXCLUDED from text use:
+     stone   #78716C  -> 4.45:1 on cream. Fails AA by 0.05. Never body text.
+     sage    #87A96B  -> 2.46:1 on cream, 2.65:1 on white. Dark surfaces only.
+     champagne #A79076 -> 2.82:1 on cream. Dark surfaces only (5.62:1 on espresso).
+--------------------------------------------------------------------------- */
+
+@theme {
+  /* Surfaces */
+  --color-cream: #fdf6e3; /* primary light page surface */
+  --color-sand: #e8dfd2; /* alternating light surface */
+  --color-espresso: #1f1b17; /* dark surface — warm near-black */
+  --color-espresso-soft: #2b2724; /* raised dark surface (cards on dark) */
+
+  /* Brand */
+  --color-bronze: #725a3e; /* primary accent / CTA fill */
+  --color-bronze-deep: #5a4630; /* CTA hover + muted text on light */
+  --color-champagne: #a79076; /* accent + muted text on DARK only */
+
+  /* Text */
+  --color-ink: #333333; /* body text on light: 11.71:1 on cream */
+
+  /* Typography — Geologica is the brand face (shared with the guest app). */
+  --font-sans: 'Geologica', ui-sans-serif, system-ui, -apple-system, sans-serif;
+
+  /* Motion */
+  --ease-elegant: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* Z-index scale */
+  --z-header: 40;
+  --z-lightbox: 60;
+}
+
+/* ---------------------------------------------------------------------------
+   Base
+--------------------------------------------------------------------------- */
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    /* Offset anchor targets so the fixed header never covers a heading. */
+    scroll-padding-top: 5.5rem;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-cream);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-weight: 400;
+    font-size: 1.0625rem; /* 17px — above the 16px mobile minimum */
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Headings use light weights at large sizes for an understated, elegant
+     voice. Weight stays >=400 at body sizes so legibility never suffers. */
+  h1,
+  h2,
+  h3,
+  h4 {
+    color: var(--color-ink);
+    text-wrap: balance;
+  }
+
+  /* A single visible focus treatment, applied consistently everywhere.
+     bronze-deep on cream = 8.27:1, far above the 3:1 required for UI. */
+  :focus-visible {
+    outline: 2px solid var(--color-bronze-deep);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  /* On dark surfaces the ring switches to champagne (5.62:1 on espresso). */
+  .on-dark :focus-visible,
+  .on-dark:focus-visible {
+    outline-color: var(--color-champagne);
+  }
+
+  /* Never remove focus for keyboard users; only suppress the mouse-click ring. */
+  :focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  ::selection {
+    background-color: var(--color-bronze);
+    color: #ffffff; /* 6.47:1 */
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Components
+--------------------------------------------------------------------------- */
+
+@layer components {
+  /* Eyebrow / section kicker. Letterspaced small caps, the quiet luxury
+     convention. Uses bronze-deep (8.27:1 on cream) not champagne. */
+  .eyebrow {
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--color-bronze-deep);
+  }
+
+  .on-dark .eyebrow {
+    color: var(--color-champagne); /* 5.62:1 on espresso */
+  }
+
+  /* Hairline rule — structure without heaviness. */
+  .hairline {
+    border-color: color-mix(in srgb, var(--color-bronze) 24%, transparent);
+  }
+
+  /* Every interactive target is at least 44x44 CSS px, comfortably clearing
+     WCAG 2.2 SC 2.5.8's 24x24 minimum. */
+  .tap-target {
+    min-width: 44px;
+    min-height: 44px;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Reduced motion
+   ---------------------------------------------------------------------------
+   Motion components use the useReducedMotion() hook for their fallbacks. This
+   block is the CSS backstop: it neutralises any transition or animation that
+   isn't driven by JS, so nothing can slip through.
+--------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
