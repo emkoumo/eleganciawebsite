@@ -41,6 +41,24 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={geologica.variable}>
+      <head>
+        {/*
+          No-JS safety net.
+
+          Motion serialises `initial="hidden"` into the server-rendered HTML, so
+          every scroll-reveal element ships with an inline `opacity: 0`. With JS
+          working, whileInView clears it. With JS disabled or broken, it never
+          clears — and the entire page below the hero stays permanently
+          invisible. WAVE surfaced this as ~100 "very low contrast" findings; the
+          underlying fault is worse than contrast.
+
+          A stylesheet rule with !important outranks a non-important inline
+          style, which is what lets this override Motion's own output.
+        */}
+        <noscript>
+          <style>{`[data-reveal]{opacity:1!important;transform:none!important;}`}</style>
+        </noscript>
+      </head>
       <body>
         {/*
           Skip link — the first focusable element on the page, per the brief.

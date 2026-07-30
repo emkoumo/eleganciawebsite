@@ -89,7 +89,9 @@ export function VillaImage({
           <circle cx="15.5" cy="9" r="1.5" />
         </svg>
         <p className="text-xs font-medium leading-snug text-bronze-deep">{alt}</p>
-        <p className="mt-2 font-mono text-[10px] leading-tight text-bronze-deep/70">
+        {/* 12px, not 10px: WAVE flags anything under ~10px as "very small
+            text", once per placeholder — 18 alerts from dev scaffolding. */}
+        <p className="mt-2 font-mono text-xs leading-tight text-bronze-deep">
           {filename}
         </p>
       </div>

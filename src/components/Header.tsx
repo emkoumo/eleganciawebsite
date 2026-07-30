@@ -13,24 +13,28 @@ const navLinks = [
 ]
 
 export function Header() {
-  /* `scrolled` swaps the header from a transparent overlay on the hero to a
-     solid surface. Solid matters for contrast: over a photograph we can only
-     guarantee AA because the hero paints a minimum 85% espresso scrim beneath
-     this bar (see the measurements in Hero.tsx). Once past the hero there is no
-     scrim, so the header must supply its own opaque background.
+  /* ---------------------------------------------------------------------
+     This header is ALWAYS opaque. It previously started transparent over the
+     hero and went solid on scroll, which was wrong twice over:
 
-     Hover colour is white, not champagne: champagne reaches only 3.53:1 against
-     the scrim, below the 4.5:1 small-text floor. */
-  const [scrolled, setScrolled] = useState(false)
+       1. Contrast. The dark look came from the hero's absolutely-positioned
+          scrim — a sibling subtree, not an ancestor. So sand nav text actually
+          resolved against <body>'s cream at 1.22:1. Every automated checker
+          reports that correctly (WAVE flagged all six nav links); it only
+          *looked* fine because the hero painted dark pixels behind it.
+       2. No-JS. The solid state was React state driven by a scroll listener,
+          so with JS disabled the header stayed transparent forever — scroll to
+          the cream sections and the navigation became invisible.
+
+     A semi-transparent background does not fix this: contrast can only be
+     computed against an opaque ancestor, so anything below alpha 1 still
+     resolves to body. Opaque is the only honest answer.
+
+     Hover colour is white rather than champagne, which reaches only 3.53:1
+     over the hero scrim — below the 4.5:1 small-text floor.
+     --------------------------------------------------------------------- */
   const [menuOpen, setMenuOpen] = useState(false)
   const toggleRef = useRef<HTMLButtonElement>(null)
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24)
-    onScroll()
-    window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
-  }, [])
 
   /* Escape closes the mobile menu and returns focus to the toggle that opened
      it, so keyboard focus is never left orphaned. */
@@ -46,19 +50,20 @@ export function Header() {
     return () => document.removeEventListener('keydown', onKey)
   }, [menuOpen])
 
-  /* The header sits on dark ground in both states (scrim over hero, solid
-     espresso after), so `on-dark` keeps focus rings champagne throughout. */
+  /* Solid espresso throughout, so `on-dark` keeps focus rings champagne and
+     every text pairing here resolves against a known opaque background:
+     sand 12.97:1, champagne 5.62:1, white 12.63:1. */
   return (
-    <header
-      className={`on-dark fixed inset-x-0 top-0 z-40 transition-colors duration-300 ${
-        scrolled || menuOpen ? 'bg-espresso' : 'bg-transparent'
-      }`}
-    >
+    <header className="on-dark fixed inset-x-0 top-0 z-40 border-b border-champagne/15 bg-espresso">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-6 px-6 py-4">
+        {/* Links to "/" rather than "#main": pointing it at #main duplicated the
+            skip link's destination, which WAVE reports as a redundant link. */}
         <a
-          href="#main"
-          aria-label={`${site.name} — back to top`}
-          className="flex shrink-0 items-center"
+          href="/"
+          aria-label={`${site.name} — home`}
+          /* text-sand so any text inheriting from this link is legible on the
+             espresso bar, rather than inheriting body's ink at 1.37:1. */
+          className="flex shrink-0 items-center text-sand"
         >
           {/* Light logo variant: champagne + sand, for dark backgrounds. */}
           <Image

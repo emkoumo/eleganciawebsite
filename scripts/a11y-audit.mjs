@@ -47,6 +47,65 @@ async function runAxe(page) {
   )
 }
 
+/* --------------------------------------------------------------------------
+   Contrast against the nearest OPAQUE ancestor.
+
+   axe resolves contrast against the painted backdrop, so it accepts text whose
+   dark background is drawn by a *sibling* subtree. That is exactly how a
+   transparent header sitting over the hero's absolutely-positioned scrim passed
+   axe while WAVE correctly reported 1.22:1 against body's cream. This walks
+   ancestors for a genuinely opaque background, the way WAVE does, and runs on
+   the no-JS page too — where no scroll-reveal has fired.
+-------------------------------------------------------------------------- */
+function contrastProbe() {
+  const parse = (c) => {
+    const m = c.match(/rgba?\(([\d.]+),\s*([\d.]+),\s*([\d.]+)(?:,\s*([\d.]+))?\)/)
+    return m ? { r: +m[1], g: +m[2], b: +m[3], a: m[4] === undefined ? 1 : +m[4] } : null
+  }
+  const lin = (v) => { v /= 255; return v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4 }
+  const lum = (c) => 0.2126 * lin(c.r) + 0.7152 * lin(c.g) + 0.0722 * lin(c.b)
+  const cr = (f, b) => { const x = lum(f), y = lum(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05) }
+  const out = []
+  for (const el of document.querySelectorAll('*')) {
+    if (![...el.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim())) continue
+    const cs = getComputedStyle(el)
+    if (cs.visibility === 'hidden' || cs.display === 'none') continue
+    if (Number(cs.opacity) < 0.99) continue
+    /* Skip visually-hidden text (.sr-only clips to a 1x1 box). Contrast
+       criteria apply to text a sighted user can actually see; a screen reader
+       does not care what colour its announcements would have been. */
+    const box = el.getBoundingClientRect()
+    if (box.width <= 1 || box.height <= 1) continue
+    const fg = parse(cs.color)
+    if (!fg) continue
+    let n = el, bg = null
+    while (n && n !== document.documentElement) {
+      const c = parse(getComputedStyle(n).backgroundColor)
+      if (c && c.a > 0.99) { bg = c; break }
+      n = n.parentElement
+    }
+    if (!bg) bg = { r: 255, g: 255, b: 255, a: 1 }
+    const size = parseFloat(cs.fontSize)
+    const need = size >= 24 || (size >= 18.66 && Number(cs.fontWeight) >= 700) ? 3 : 4.5
+    const ratio = cr(fg, bg)
+    if (ratio < need) out.push({ text: el.textContent.trim().slice(0, 40), ratio: +ratio.toFixed(2), need, size })
+  }
+  return out
+}
+
+async function checkOpaqueContrast(page, label) {
+  const issues = await page.evaluate(contrastProbe)
+  console.log(
+    issues.length === 0
+      ? `  \u2713 Contrast vs opaque ancestor (${label}) — all text passes`
+      : `  \u2717 Contrast vs opaque ancestor (${label}) — ${issues.length} failure(s):`,
+  )
+  for (const i of issues.slice(0, 8)) {
+    console.log(`      ${i.ratio}/${i.need} at ${i.size}px — "${i.text}"`)
+  }
+  failures += issues.length
+}
+
 let failures = 0
 
 function report(label, results) {
@@ -253,6 +312,32 @@ try {
   )
   if (!rmOk) failures++
   report('Landing page, reduced motion', await runAxe(rm))
+
+  // --- 6. JavaScript disabled ---------------------------------------------
+  /* The pass that matters most, and the one this script originally lacked.
+     Sections 1-5 scroll the page before auditing, which fires every
+     whileInView reveal — and therefore hides the fact that Motion ships
+     `opacity: 0` in the server-rendered HTML. With JS off that never clears
+     and the whole page below the hero is invisible. WAVE caught this as ~100
+     contrast findings; scrolling first had masked it completely. */
+  const nojs = await browser.newPage()
+  await nojs.setJavaScriptEnabled(false)
+  await nojs.goto(BASE_URL, { waitUntil: 'networkidle0' })
+  await new Promise((r) => setTimeout(r, 400))
+  const nojsVisible = await nojs.evaluate(() => {
+    const els = [...document.querySelectorAll('[data-reveal]')]
+    const hidden = els.filter((el) => Number(getComputedStyle(el).opacity) < 0.99)
+    return { total: els.length, hidden: hidden.length }
+  })
+  console.log(
+    nojsVisible.hidden === 0
+      ? `  ✓ No-JS: all ${nojsVisible.total} reveal elements visible`
+      : `  ✗ No-JS: ${nojsVisible.hidden}/${nojsVisible.total} reveal elements stuck at opacity 0`,
+  )
+  if (nojsVisible.hidden > 0) failures++
+
+  await checkOpaqueContrast(page, 'default')
+  await checkOpaqueContrast(nojs, 'JavaScript disabled')
 } finally {
   await browser?.close()
   server.kill('SIGTERM')

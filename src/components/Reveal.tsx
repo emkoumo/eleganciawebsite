@@ -33,6 +33,7 @@ export function Reveal({
 
   return (
     <Component
+      data-reveal
       className={className}
       variants={variants}
       initial="hidden"
@@ -61,6 +62,7 @@ export function RevealGroup({
 
   return (
     <Component
+      data-reveal
       className={className}
       variants={variants}
       initial="hidden"
@@ -83,7 +85,7 @@ export function RevealItem({
   const Component = motion[as]
 
   return (
-    <Component className={className} variants={variants}>
+    <Component data-reveal className={className} variants={variants}>
       {children}
     </Component>
   )

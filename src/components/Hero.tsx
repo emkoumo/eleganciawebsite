@@ -62,6 +62,7 @@ export function Hero() {
       />
 
       <motion.div
+        data-reveal
         className="mx-auto w-full max-w-6xl px-6 pb-20 pt-32 sm:pb-28"
         variants={group}
         initial="hidden"
@@ -69,11 +70,12 @@ export function Hero() {
       >
         {/* Overrides .eyebrow's champagne to sand: at 12px over the scrim,
             champagne cannot reach 4.5:1. See the scrim note above. */}
-        <motion.p variants={item} className="eyebrow !text-sand">
+        <motion.p data-reveal variants={item} className="eyebrow !text-sand">
           {site.location}
         </motion.p>
 
         <motion.h1
+          data-reveal
           variants={item}
           id="hero-heading"
           className="mt-5 max-w-3xl text-balance text-[clamp(2.5rem,7vw,5rem)] font-extralight leading-[1.05] tracking-[-0.02em] text-sand"
@@ -82,13 +84,14 @@ export function Hero() {
         </motion.h1>
 
         <motion.p
+          data-reveal
           variants={item}
           className="mt-6 max-w-xl text-pretty text-base leading-relaxed text-sand/90 sm:text-lg"
         >
           {site.hero.subtext}
         </motion.p>
 
-        <motion.div variants={item} className="mt-10">
+        <motion.div data-reveal variants={item} className="mt-10">
           <a
             href={site.bookingUrl}
             target="_blank"
