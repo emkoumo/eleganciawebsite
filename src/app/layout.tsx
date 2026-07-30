@@ -31,7 +31,9 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  themeColor: '#fdf6e3',
+  /* Must track --color-cream, or mobile browsers paint a seam between their
+     chrome and the page background. */
+  themeColor: '#fffbf0',
 }
 
 export default function RootLayout({

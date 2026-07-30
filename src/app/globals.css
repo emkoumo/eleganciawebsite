@@ -8,14 +8,16 @@
    inline. Do not introduce a new text/background pair without measuring it.
 
    Deliberately EXCLUDED from text use:
-     stone   #78716C  -> 4.45:1 on cream. Fails AA by 0.05. Never body text.
-     sage    #87A96B  -> 2.46:1 on cream, 2.65:1 on white. Dark surfaces only.
-     champagne #A79076 -> 2.82:1 on cream. Dark surfaces only (5.62:1 on espresso).
+     stone   #78716C  -> 4.64:1 on cream (passes) but only 3.64:1 on sand, and
+                         both are page surfaces. Excluded so one muted-text
+                         token stays valid everywhere. Use bronze-deep instead.
+     sage    #87A96B  -> 2.57:1 on cream, 2.65:1 on white. Dark surfaces only.
+     champagne #A79076 -> 2.95:1 on cream. Dark surfaces only (5.62:1 on espresso).
 --------------------------------------------------------------------------- */
 
 @theme {
   /* Surfaces */
-  --color-cream: #fdf6e3; /* primary light page surface */
+  --color-cream: #fffbf0; /* primary light page surface */
   --color-sand: #e8dfd2; /* alternating light surface */
   --color-espresso: #1f1b17; /* dark surface — warm near-black */
   --color-espresso-soft: #2b2724; /* raised dark surface (cards on dark) */
@@ -26,7 +28,7 @@
   --color-champagne: #a79076; /* accent + muted text on DARK only */
 
   /* Text */
-  --color-ink: #333333; /* body text on light: 11.71:1 on cream */
+  --color-ink: #333333; /* body text on light: 12.22:1 on cream, 9.58:1 on sand */
 
   /* Typography — Geologica is the brand face (shared with the guest app). */
   --font-sans: 'Geologica', ui-sans-serif, system-ui, -apple-system, sans-serif;
@@ -72,7 +74,7 @@
   }
 
   /* A single visible focus treatment, applied consistently everywhere.
-     bronze-deep on cream = 8.27:1, far above the 3:1 required for UI. */
+     bronze-deep on cream = 8.63:1, far above the 3:1 required for UI. */
   :focus-visible {
     outline: 2px solid var(--color-bronze-deep);
     outline-offset: 3px;
@@ -108,6 +110,7 @@
     font-weight: 500;
     letter-spacing: 0.18em;
     text-transform: uppercase;
+    /* bronze-deep: 8.63:1 on cream, 6.76:1 on sand. Valid on both surfaces. */
     color: var(--color-bronze-deep);
   }
 
