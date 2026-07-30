@@ -15,6 +15,13 @@ const sizes = [
   { name: 'desktop', width: 1440, height: 900 },
 ]
 
+/* Both locales, so Greek copy length is reviewed too — Greek runs noticeably
+   longer than English and is where headings wrap badly if they are going to. */
+const locales = [
+  { name: 'en', path: '/' },
+  { name: 'el', path: '/el' },
+]
+
 mkdirSync(OUT, { recursive: true })
 
 const server = spawn('npx', ['next', 'start', '--port', String(PORT)], {
@@ -37,10 +44,10 @@ try {
   await waitForServer()
   browser = await puppeteer.launch({ headless: true })
 
-  for (const size of sizes) {
+  for (const locale of locales) for (const size of sizes) {
     const page = await browser.newPage()
     await page.setViewport({ width: size.width, height: size.height })
-    await page.goto(BASE, { waitUntil: 'networkidle0' })
+    await page.goto(BASE + locale.path, { waitUntil: 'networkidle0' })
 
     /* Scroll through so every whileInView reveal has fired before capture.
        The page sets `scroll-behavior: smooth`, which makes scrollTo animate —
@@ -61,9 +68,9 @@ try {
     })
     await new Promise((r) => setTimeout(r, 800))
 
-    await page.screenshot({ path: `${OUT}/${size.name}-hero.png` })
-    await page.screenshot({ path: `${OUT}/${size.name}-full.png`, fullPage: true })
-    console.log(`captured ${size.name}`)
+    await page.screenshot({ path: `${OUT}/${locale.name}-${size.name}-hero.png` })
+    await page.screenshot({ path: `${OUT}/${locale.name}-${size.name}-full.png`, fullPage: true })
+    console.log(`captured ${locale.name} ${size.name}`)
     await page.close()
   }
 } finally {

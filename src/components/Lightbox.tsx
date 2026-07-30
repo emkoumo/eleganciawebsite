@@ -1,58 +1,59 @@
 'use client'
 
 import { useCallback, useEffect, useRef } from 'react'
+import Image from 'next/image'
 import { AnimatePresence, motion } from 'motion/react'
-import { VillaImage } from '@/components/VillaImage'
 import { useLightboxVariants } from '@/lib/motion'
-import type { GalleryItem } from '@/lib/site'
+import { photoSrc, type Photo } from '@/lib/photos'
+import { getDictionary, type Locale } from '@/lib/i18n'
 
 /* ---------------------------------------------------------------------------
    Lightbox
    ---------------------------------------------------------------------------
-   Accessibility contract from the brief:
+   Accessibility contract:
      - operable via keyboard and screen reader
      - focus trapped while open
      - Escape to close
      - focus returned to the thumbnail that opened it
 
-   Implemented as a role="dialog" aria-modal container. A native <dialog> would
-   give the trap for free, but its ::backdrop cannot be animated by Motion, and
-   the brief asks for animated open/close — so the trap is done by hand below.
+   A native <dialog> would give the trap for free, but its ::backdrop cannot be
+   animated by Motion and the brief asks for animated open/close — so the trap
+   is done by hand below.
 --------------------------------------------------------------------------- */
 
 type Props = {
-  items: GalleryItem[]
-  /** Index into `items`, or null when closed. */
+  photos: Photo[]
+  /** Index into `photos`, or null when closed. */
   index: number | null
+  locale: Locale
   onClose: () => void
   onNavigate: (index: number) => void
 }
 
-export function Lightbox({ items, index, onClose, onNavigate }: Props) {
+export function Lightbox({ photos, index, locale, onClose, onNavigate }: Props) {
+  const d = getDictionary(locale)
   const { backdrop, panel } = useLightboxVariants()
   const panelRef = useRef<HTMLDivElement>(null)
   const closeRef = useRef<HTMLButtonElement>(null)
-  /* The element that had focus before opening, so it can be restored. */
   const returnFocusRef = useRef<HTMLElement | null>(null)
 
   const isOpen = index !== null
-  const item = isOpen ? items[index] : null
+  const photo = isOpen ? photos[index] : null
 
   const goPrev = useCallback(() => {
     if (index === null) return
-    onNavigate((index - 1 + items.length) % items.length)
-  }, [index, items.length, onNavigate])
+    onNavigate((index - 1 + photos.length) % photos.length)
+  }, [index, photos.length, onNavigate])
 
   const goNext = useCallback(() => {
     if (index === null) return
-    onNavigate((index + 1) % items.length)
-  }, [index, items.length, onNavigate])
+    onNavigate((index + 1) % photos.length)
+  }, [index, photos.length, onNavigate])
 
   /* Remember what to focus on close, and move focus into the dialog on open. */
   useEffect(() => {
     if (!isOpen) return
     returnFocusRef.current = document.activeElement as HTMLElement
-    /* rAF so the panel is mounted before we try to focus into it. */
     const raf = requestAnimationFrame(() => closeRef.current?.focus())
     return () => cancelAnimationFrame(raf)
   }, [isOpen])
@@ -70,7 +71,7 @@ export function Lightbox({ items, index, onClose, onNavigate }: Props) {
     }
   }, [isOpen])
 
-  /* Keyboard: Escape closes, arrows navigate, Tab is trapped inside. */
+  /* Escape closes, arrows navigate, Tab is trapped inside. */
   useEffect(() => {
     if (!isOpen) return
 
@@ -92,7 +93,6 @@ export function Lightbox({ items, index, onClose, onNavigate }: Props) {
       }
       if (e.key !== 'Tab') return
 
-      /* Focus trap: cycle within the panel's focusable elements. */
       const focusables = panelRef.current?.querySelectorAll<HTMLElement>(
         'button:not([disabled]), [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
       )
@@ -115,7 +115,6 @@ export function Lightbox({ items, index, onClose, onNavigate }: Props) {
     return () => document.removeEventListener('keydown', onKeyDown)
   }, [isOpen, onClose, goPrev, goNext])
 
-  /* Restore focus to the opening thumbnail once closed. */
   const handleClose = useCallback(() => {
     onClose()
     returnFocusRef.current?.focus()
@@ -123,7 +122,7 @@ export function Lightbox({ items, index, onClose, onNavigate }: Props) {
 
   return (
     <AnimatePresence>
-      {isOpen && item && (
+      {isOpen && photo && (
         <motion.div
           className="on-dark fixed inset-0 z-[60] flex items-center justify-center bg-espresso/95 p-4 sm:p-8"
           variants={backdrop}
@@ -132,8 +131,7 @@ export function Lightbox({ items, index, onClose, onNavigate }: Props) {
           exit="exit"
           role="dialog"
           aria-modal="true"
-          aria-label={`Photograph ${index + 1} of ${items.length}: ${item.alt}`}
-          /* Clicking the backdrop closes; the panel stops propagation. */
+          aria-label={`${d.gallery.counter(index + 1, photos.length)}: ${photo.alt[locale]}`}
           onClick={handleClose}
         >
           <motion.div
@@ -144,15 +142,15 @@ export function Lightbox({ items, index, onClose, onNavigate }: Props) {
           >
             <div className="flex items-center justify-between gap-4 pb-3">
               <p className="text-xs text-champagne">
-                {index + 1} / {items.length}
+                {index + 1} / {photos.length}
               </p>
               <button
                 ref={closeRef}
                 type="button"
                 onClick={handleClose}
-                className="tap-target -mr-2 flex cursor-pointer items-center justify-center text-sand transition-colors duration-200 hover:text-champagne"
+                className="tap-target -mr-2 flex cursor-pointer items-center justify-center text-sand transition-colors duration-200 hover:text-white"
               >
-                <span className="sr-only">Close photograph viewer</span>
+                <span className="sr-only">{d.gallery.close}</span>
                 <svg
                   width="24"
                   height="24"
@@ -167,14 +165,14 @@ export function Lightbox({ items, index, onClose, onNavigate }: Props) {
               </button>
             </div>
 
-            <VillaImage
-              src={item.src}
-              alt={item.alt}
-              /* Described by the dialog's aria-label and the live caption
-                 below, so the image itself stays silent. */
-              decorative
-              width={item.width}
-              height={item.height}
+            {/* Described by the dialog's aria-label and the live caption below,
+                so the image itself stays silent to avoid triple announcement. */}
+            <Image
+              src={photoSrc(photo)}
+              alt=""
+              aria-hidden="true"
+              width={photo.width}
+              height={photo.height}
               priority
               sizes="(max-width: 1024px) 100vw, 1024px"
               className="max-h-[70svh] w-full object-contain"
@@ -184,7 +182,7 @@ export function Lightbox({ items, index, onClose, onNavigate }: Props) {
               <button
                 type="button"
                 onClick={goPrev}
-                className="tap-target inline-flex cursor-pointer items-center gap-2 px-1 text-sm text-sand transition-colors duration-200 hover:text-champagne"
+                className="tap-target inline-flex cursor-pointer items-center gap-2 px-1 text-sm text-sand transition-colors duration-200 hover:text-white"
               >
                 <svg
                   width="18"
@@ -197,24 +195,23 @@ export function Lightbox({ items, index, onClose, onNavigate }: Props) {
                 >
                   <path d="M14 8H3M7 4L3 8l4 4" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
-                Previous
+                <span className="hidden sm:inline">{d.gallery.prev}</span>
               </button>
 
-              {/* aria-live so arrow-key navigation is announced. The caption is
-                  the authoritative description of the current photograph. */}
+              {/* aria-live so arrow-key navigation is announced. */}
               <p
                 aria-live="polite"
                 className="flex-1 text-center text-xs leading-relaxed text-sand/90 sm:text-sm"
               >
-                {item.alt}
+                {photo.alt[locale]}
               </p>
 
               <button
                 type="button"
                 onClick={goNext}
-                className="tap-target inline-flex cursor-pointer items-center gap-2 px-1 text-sm text-sand transition-colors duration-200 hover:text-champagne"
+                className="tap-target inline-flex cursor-pointer items-center gap-2 px-1 text-sm text-sand transition-colors duration-200 hover:text-white"
               >
-                Next
+                <span className="hidden sm:inline">{d.gallery.next}</span>
                 <svg
                   width="18"
                   height="18"

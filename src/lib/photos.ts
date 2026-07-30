@@ -1,0 +1,68 @@
+import photoData from '@/data/photos.json'
+import type { Locale } from '@/lib/i18n'
+
+/* ---------------------------------------------------------------------------
+   Photos
+   ---------------------------------------------------------------------------
+   src/data/photos.json is the single source of truth, shared with
+   scripts/process-photos.mjs — the script reads `source` to know what to
+   resize and writes back the real output `width`/`height`, so the dimensions
+   here always match the files on disk. That is what lets the grid reserve
+   exact aspect ratios and avoid layout shift.
+
+   Alt text was written after viewing every photograph, in both languages.
+--------------------------------------------------------------------------- */
+
+export type PhotoCategory = 'outdoor' | 'living' | 'kitchen' | 'bedroom' | 'bathroom'
+
+export type Photo = {
+  file: string
+  category: PhotoCategory
+  width: number
+  height: number
+  hero?: boolean
+  alt: Record<Locale, string>
+}
+
+type RawPhoto = {
+  source: string
+  file: string
+  category: string
+  width?: number
+  height?: number
+  hero?: boolean
+  alt: { en: string; el: string }
+}
+
+const raw = photoData as RawPhoto[]
+
+export const photos: Photo[] = raw.map((p) => {
+  if (!p.width || !p.height) {
+    throw new Error(
+      `Photo "${p.file}" has no dimensions. Run: node scripts/process-photos.mjs`,
+    )
+  }
+  return {
+    file: p.file,
+    category: p.category as PhotoCategory,
+    width: p.width,
+    height: p.height,
+    hero: p.hero,
+    alt: { en: p.alt.en, el: p.alt.el },
+  }
+})
+
+export const heroPhoto: Photo =
+  photos.find((p) => p.hero) ?? photos[0]
+
+/** Gallery excludes the hero — it is already the largest thing on the page. */
+export const galleryPhotos: Photo[] = photos.filter((p) => !p.hero)
+
+export function photoSrc(photo: Photo): string {
+  return `/images/gallery/${photo.file}`
+}
+
+/** Portrait tiles span more rows in the masonry grid. */
+export function isPortrait(photo: Photo): boolean {
+  return photo.height > photo.width
+}
