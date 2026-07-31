@@ -11,7 +11,7 @@ export function Amenities({ locale }: { locale: Locale }) {
     <section
       id="amenities"
       aria-labelledby="amenities-heading"
-      className="bg-sand py-24 md:py-32 lg:py-40"
+      className="bg-cream py-24 md:py-32 lg:py-40"
     >
       <div className="mx-auto max-w-6xl px-6">
         <Reveal className="max-w-2xl">

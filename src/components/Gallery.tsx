@@ -49,7 +49,7 @@ export function Gallery({ locale }: { locale: Locale }) {
     <section
       id="gallery"
       aria-labelledby="gallery-heading"
-      className="bg-cream py-24 md:py-32 lg:py-40"
+      className="bg-sand py-24 md:py-32 lg:py-40"
     >
       <div className="mx-auto max-w-6xl px-6">
         <Reveal className="max-w-2xl">
@@ -141,7 +141,7 @@ export function Gallery({ locale }: { locale: Locale }) {
                   /* Descriptive label — "photo" alone would tell a screen-reader
                      user nothing about which image they are opening. */
                   aria-label={d.gallery.viewLarger(photo.alt[locale])}
-                  className="group h-full w-full cursor-pointer overflow-hidden bg-sand"
+                  className="group h-full w-full cursor-pointer overflow-hidden bg-cream"
                 >
                   {/* Silent: the button's aria-label already describes it. */}
                   <Image

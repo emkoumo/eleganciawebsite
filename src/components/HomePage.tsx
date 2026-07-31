@@ -1,6 +1,5 @@
 import { Hero } from '@/components/Hero'
 import { About } from '@/components/About'
-import { Villas } from '@/components/Villas'
 import { Highlights } from '@/components/Highlights'
 import { Amenities } from '@/components/Amenities'
 import { Gallery } from '@/components/Gallery'
@@ -15,7 +14,6 @@ export function HomePage({ locale }: { locale: Locale }) {
     <>
       <Hero locale={locale} />
       <About locale={locale} />
-      <Villas locale={locale} />
       <Highlights locale={locale} />
       <Amenities locale={locale} />
       <Gallery locale={locale} />

@@ -10,7 +10,7 @@ export function Contact({ locale }: { locale: Locale }) {
     <section
       id="contact"
       aria-labelledby="contact-heading"
-      className="bg-sand py-24 md:py-32 lg:py-40"
+      className="bg-cream py-24 md:py-32 lg:py-40"
     >
       <div className="mx-auto max-w-6xl px-6">
         <div className="grid gap-x-16 gap-y-12 lg:grid-cols-12">

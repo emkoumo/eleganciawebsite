@@ -12,7 +12,7 @@ export function Highlights({ locale }: { locale: Locale }) {
     <section
       id="highlights"
       aria-labelledby="highlights-heading"
-      className="bg-cream py-24 md:py-32"
+      className="bg-sand py-24 md:py-32"
     >
       <div className="mx-auto max-w-6xl px-6">
         <Reveal className="max-w-2xl">

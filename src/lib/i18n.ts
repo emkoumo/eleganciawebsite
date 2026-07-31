@@ -30,7 +30,7 @@ export type Dictionary = {
   switchTo: string
   switchToAria: string
   skipToMain: string
-  nav: { about: string; villas: string; amenities: string; gallery: string; contact: string; book: string }
+  nav: { about: string; amenities: string; gallery: string; contact: string; book: string }
   opensNewTab: string
   bookOnBooking: string
   hero: {
@@ -44,15 +44,10 @@ export type Dictionary = {
     cta: string
   }
   about: { eyebrow: string; heading: string; paragraphs: string[] }
-  villas: {
-    eyebrow: string
-    heading: string
-    body: string
-    names: [string, string, string]
-    /* Capacity ladder: the point of three identical villas is that they
-       combine, so this is the one genuinely useful thing to say about them. */
-    capacity: { villas: string; guests: string; note: string }[]
-  }
+  /* The villas section was removed — three identical villas gave it nothing
+     useful to say. The names survive only to populate the contact form's
+     "which villa interests you?" dropdown. */
+  villas: { names: [string, string, string] }
   highlights: { eyebrow: string; heading: string; items: { label: string; icon: AmenityIcon }[] }
   amenities: {
     eyebrow: string
@@ -112,7 +107,7 @@ const en: Dictionary = {
   switchTo: 'Ελληνικά',
   switchToAria: 'Switch language to Greek',
   skipToMain: 'Skip to main content',
-  nav: { about: 'About', villas: 'The Villas', amenities: 'Amenities', gallery: 'Gallery', contact: 'Contact', book: 'Book' },
+  nav: { about: 'About', amenities: 'Amenities', gallery: 'Gallery', contact: 'Contact', book: 'Book' },
   opensNewTab: '(opens in a new tab)',
   bookOnBooking: 'on Booking.com',
   hero: {
@@ -135,18 +130,7 @@ const en: Dictionary = {
       'The interiors are deliberately understated — microcement, pale oak, natural stone and linen in a Mediterranean palette of cream, sand and bronze. Nothing competes with the view. The intention throughout is restraint rather than display.',
     ],
   },
-  villas: {
-    eyebrow: 'The villas',
-    heading: 'Book one, or take all three',
-    body:
-      'The three villas are identical — same two master bedrooms, same two bathrooms, same private pool and hot tub. There is no better or worse one, so there is nothing to weigh up. What that does give you is scale: book one villa, or take the whole complex and have the place to yourselves.',
-    names: ['Villa 1', 'Villa 2', 'Villa 3'],
-    capacity: [
-      { villas: 'One villa', guests: '6 guests', note: 'Two master bedrooms, two bathrooms, private pool and hot tub.' },
-      { villas: 'Two villas', guests: '12 guests', note: 'Adjoining plots — two families, together but not on top of each other.' },
-      { villas: 'All three', guests: '18 guests', note: 'Exclusive use of the entire complex. No other guests on site.' },
-    ],
-  },
+  villas: { names: ['Villa 1', 'Villa 2', 'Villa 3'] },
   highlights: {
     eyebrow: 'Highlights',
     heading: 'What matters most',
@@ -250,7 +234,7 @@ const el: Dictionary = {
   switchTo: 'English',
   switchToAria: 'Αλλαγή γλώσσας σε Αγγλικά',
   skipToMain: 'Μετάβαση στο κύριο περιεχόμενο',
-  nav: { about: 'Το συγκρότημα', villas: 'Οι βίλες', amenities: 'Παροχές', gallery: 'Φωτογραφίες', contact: 'Επικοινωνία', book: 'Κράτηση' },
+  nav: { about: 'Το συγκρότημα', amenities: 'Παροχές', gallery: 'Φωτογραφίες', contact: 'Επικοινωνία', book: 'Κράτηση' },
   opensNewTab: '(ανοίγει σε νέα καρτέλα)',
   bookOnBooking: 'στο Booking.com',
   hero: {
@@ -273,18 +257,7 @@ const el: Dictionary = {
       'Οι εσωτερικοί χώροι είναι σκόπιμα λιτοί — microcement, ανοιχτή δρυς, φυσική πέτρα και λινά, σε μια μεσογειακή παλέτα από κρεμ, άμμο και μπρονζέ. Τίποτα δεν ανταγωνίζεται τη θέα. Η πρόθεση παντού είναι η εγκράτεια, όχι η επίδειξη.',
     ],
   },
-  villas: {
-    eyebrow: 'Οι βίλες',
-    heading: 'Μία βίλα ή και οι τρεις',
-    body:
-      'Οι τρεις βίλες είναι πανομοιότυπες — ίδια δύο master υπνοδωμάτια, ίδια δύο μπάνια, ίδια ιδιωτική πισίνα και υδρομασάζ. Δεν υπάρχει καλύτερη ή χειρότερη, άρα δεν έχετε τίποτα να ζυγίσετε. Αυτό που κερδίζετε είναι η κλίμακα: κλείστε μία βίλα ή ολόκληρο το συγκρότημα και έχετε τον χώρο μόνο για εσάς.',
-    names: ['Βίλα 1', 'Βίλα 2', 'Βίλα 3'],
-    capacity: [
-      { villas: 'Μία βίλα', guests: '6 επισκέπτες', note: 'Δύο master υπνοδωμάτια, δύο μπάνια, ιδιωτική πισίνα και υδρομασάζ.' },
-      { villas: 'Δύο βίλες', guests: '12 επισκέπτες', note: 'Γειτονικά οικόπεδα — δύο οικογένειες μαζί, με την άνεσή τους.' },
-      { villas: 'Και οι τρεις', guests: '18 επισκέπτες', note: 'Αποκλειστική χρήση όλου του συγκροτήματος. Κανείς άλλος επισκέπτης.' },
-    ],
-  },
+  villas: { names: ['Βίλα 1', 'Βίλα 2', 'Βίλα 3'] },
   highlights: {
     eyebrow: 'Τα σημαντικά',
     heading: 'Αυτά που μετρούν',

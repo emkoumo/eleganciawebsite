@@ -34,7 +34,6 @@ export function Header({ locale }: { locale: Locale }) {
 
   const navLinks = [
     { href: '#about', label: d.nav.about },
-    { href: '#villas', label: d.nav.villas },
     { href: '#amenities', label: d.nav.amenities },
     { href: '#gallery', label: d.nav.gallery },
     { href: '#contact', label: d.nav.contact },
