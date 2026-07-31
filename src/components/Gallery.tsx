@@ -109,7 +109,14 @@ export function Gallery({ locale }: { locale: Locale }) {
           leaves. `layout` is off under reduced motion so tiles crossfade in
           place instead of sliding across the viewport.
         */}
-        <ul id="gallery-grid" className="mt-8 grid auto-rows-[4rem] grid-flow-row-dense grid-cols-2 gap-3 sm:auto-rows-[5rem] sm:gap-4 md:auto-rows-[6rem] md:grid-cols-3 lg:auto-rows-[7rem] lg:grid-cols-4">
+        {/* On mobile the grid breaks out of the container's px-6 with -mx-6 to
+            go edge to edge, and tightens to a 1px gutter — a dense mosaic reads
+            better than small framed tiles at phone width. From `sm` up it
+            returns to the padded container with normal spacing. */}
+        <ul
+          id="gallery-grid"
+          className="-mx-6 mt-8 grid auto-rows-[5.5rem] grid-flow-row-dense grid-cols-2 gap-px sm:mx-0 sm:auto-rows-[5rem] sm:gap-4 md:auto-rows-[6rem] md:grid-cols-3 lg:auto-rows-[7rem] lg:grid-cols-4"
+        >
           <AnimatePresence mode="popLayout" initial={false}>
             {visible.map((photo, i) => (
               <motion.li
