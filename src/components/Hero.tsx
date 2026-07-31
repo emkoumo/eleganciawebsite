@@ -46,16 +46,18 @@ export function Hero({ locale }: { locale: Locale }) {
         the top had to stay dark too. The header now supplies its own background,
         which frees the top of the image to be seen.
 
-        Stops are measured, not eyeballed. The text block spans roughly 39%–86%
-        of the hero's height (eyebrow down to CTA), i.e. 14%–61% measured from
-        the bottom. The gradient therefore holds >=0.85 alpha up to 65% from the
-        bottom, and only lightens above that:
+        Stops are measured, not eyeballed. The gradient holds a heavy alpha up to
+        the highest point any text reaches, then lightens sharply above it:
 
-            0%  (bottom) 0.80
-           45%           0.74
-           65%           0.58    -> lightest point still overlapped by text
-           85%           0.22    -> no text here
-          100% (top)     0.06    -> photograph essentially unveiled
+            0%  (bottom) 0.82
+           45%           0.78
+           74%           0.68    -> highest point text reaches, in Greek
+           90%           0.30    -> no text here
+          100% (top)     0.08    -> photograph essentially unveiled
+
+        The 74% stop is set by the GREEK copy, not the English: Greek runs longer,
+        so its heading wraps to an extra line and pushes the whole block upward
+        into lighter gradient. Tuned to the longer locale, verified on both.
 
         scripts/a11y-audit.mjs verifies this by sampling the ACTUAL rendered
         pixels behind each text element rather than trusting these numbers, so
@@ -66,7 +68,7 @@ export function Hero({ locale }: { locale: Locale }) {
       */}
       <div
         aria-hidden="true"
-        className="absolute inset-0 -z-10 bg-[linear-gradient(to_top,rgba(31,27,23,0.80)_0%,rgba(31,27,23,0.74)_45%,rgba(31,27,23,0.58)_65%,rgba(31,27,23,0.22)_85%,rgba(31,27,23,0.06)_100%)]"
+        className="absolute inset-0 -z-10 bg-[linear-gradient(to_top,rgba(31,27,23,0.82)_0%,rgba(31,27,23,0.78)_45%,rgba(31,27,23,0.68)_74%,rgba(31,27,23,0.30)_90%,rgba(31,27,23,0.08)_100%)]"
       />
 
       {/*
@@ -78,13 +80,14 @@ export function Hero({ locale }: { locale: Locale }) {
         this darkens only the left third, where all the text sits. The pool and
         architecture on the right stay bright.
 
-        Alphas compose: at the eyebrow the vertical scrim is ~0.58 and this adds
-        0.60, giving an effective 1-(1-0.58)(1-0.60) = 0.83 exactly where it is
-        needed. Verified by the pixel sampler in scripts/a11y-audit.mjs.
+        Alphas compose, so this lifts the text column without touching the rest:
+        where the vertical scrim is 0.68, adding 0.70 here yields an effective
+        1-(1-0.68)(1-0.70) = 0.90 exactly where it is needed. Every figure is
+        confirmed by the pixel sampler in scripts/a11y-audit.mjs.
       */}
       <div
         aria-hidden="true"
-        className="absolute inset-0 -z-10 bg-[linear-gradient(to_right,rgba(31,27,23,0.60)_0%,rgba(31,27,23,0.45)_35%,rgba(31,27,23,0)_70%)]"
+        className="absolute inset-0 -z-10 bg-[linear-gradient(to_right,rgba(31,27,23,0.70)_0%,rgba(31,27,23,0.55)_38%,rgba(31,27,23,0)_72%)]"
       />
 
       <motion.div
@@ -102,18 +105,33 @@ export function Hero({ locale }: { locale: Locale }) {
           data-reveal
           variants={item}
           id="hero-heading"
-          className="mt-5 max-w-3xl text-balance text-[clamp(2.25rem,6.5vw,5rem)] font-extralight leading-[1.05] tracking-[-0.02em] text-sand"
+          className="mt-5 max-w-3xl text-balance text-[clamp(2.25rem,6vw,4.5rem)] font-extralight leading-[1.05] tracking-[-0.02em] text-sand"
         >
           {d.hero.headline}
         </motion.h1>
 
+        {/* Subheading. A <p>, not an h2 — it restates the promise rather than
+            titling a new section, and an h2 here would sit above the real
+            section headings in the outline for no reason. */}
         <motion.p
           data-reveal
           variants={item}
-          className="mt-6 max-w-xl text-pretty text-base leading-relaxed text-sand/90 sm:text-lg"
+          className="mt-5 max-w-xl text-pretty text-lg font-light leading-snug text-sand sm:text-xl"
         >
-          {d.hero.subtext}
+          {d.hero.subheading}
         </motion.p>
+
+        {/* Three short lines, each on its own row — the quiet three-beat rhythm
+            is the point, so they are not merged into a paragraph. */}
+        <motion.div
+          data-reveal
+          variants={item}
+          className="mt-7 max-w-md space-y-1.5 text-sm leading-relaxed text-sand/90 sm:text-base"
+        >
+          {d.hero.lines.map((line) => (
+            <p key={line}>{line}</p>
+          ))}
+        </motion.div>
 
         <motion.div data-reveal variants={item} className="mt-10">
           <a

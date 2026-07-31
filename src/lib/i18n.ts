@@ -33,7 +33,16 @@ export type Dictionary = {
   nav: { about: string; villas: string; amenities: string; gallery: string; contact: string; book: string }
   opensNewTab: string
   bookOnBooking: string
-  hero: { location: string; headline: string; subtext: string; cta: string }
+  hero: {
+    location: string
+    headline: string
+    subheading: string
+    /* Three short lines, each rendered on its own row. Kept as an array rather
+       than one paragraph so the three-beat rhythm survives every breakpoint
+       instead of reflowing into a block. */
+    lines: [string, string, string]
+    cta: string
+  }
   about: { eyebrow: string; heading: string; paragraphs: string[] }
   villas: {
     eyebrow: string
@@ -108,9 +117,13 @@ const en: Dictionary = {
   bookOnBooking: 'on Booking.com',
   hero: {
     location: 'Skotina, Pieria, Greece',
-    headline: 'Between Olympus and the Aegean',
-    subtext:
-      'Three private villas in Skotina, Pieria — each with its own pool and hot tub, sleeping up to six, framed by the mountain on one side and the sea on the other.',
+    headline: 'Where simplicity meets luxury',
+    subheading: 'Private villas built around what matters',
+    lines: [
+      'Three villas on the slope between Mount Olympus and the Aegean.',
+      'Each with its own pool and hot tub, for up to six guests.',
+      'No lobby, no reception — you arrive on your own schedule.',
+    ],
     cta: 'Check availability',
   },
   about: {
@@ -242,9 +255,13 @@ const el: Dictionary = {
   bookOnBooking: 'στο Booking.com',
   hero: {
     location: 'Σκοτίνα, Πιερία, Ελλάδα',
-    headline: 'Ανάμεσα στον Όλυμπο και το Αιγαίο',
-    subtext:
-      'Τρεις ιδιωτικές βίλες στη Σκοτίνα Πιερίας — κάθε μία με ιδιωτική πισίνα και υδρομασάζ, για έως έξι επισκέπτες, με το βουνό από τη μια πλευρά και τη θάλασσα από την άλλη.',
+    headline: 'Εκεί που η απλότητα συναντά την πολυτέλεια',
+    subheading: 'Ιδιωτικές βίλες χτισμένες γύρω από αυτό που έχει σημασία',
+    lines: [
+      'Τρεις βίλες στην πλαγιά ανάμεσα στον Όλυμπο και το Αιγαίο.',
+      'Κάθε μία με ιδιωτική πισίνα και υδρομασάζ, για έως έξι επισκέπτες.',
+      'Χωρίς υποδοχή — φτάνετε στον δικό σας χρόνο.',
+    ],
     cta: 'Δείτε διαθεσιμότητα',
   },
   about: {
