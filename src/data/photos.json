@@ -152,7 +152,8 @@
       "el": "Σαλόνι με λινό καναπέ μπροστά σε τοίχο από φυσική πέτρα"
     },
     "width": 1802,
-    "height": 2400
+    "height": 2400,
+    "material": true
   },
   {
     "source": "ioannisbouklis-502.JPG",
@@ -262,7 +263,8 @@
       "el": "Ανοιχτό ράφι με γυάλινα δοχεία και μύλους αλατιού και πιπεριού"
     },
     "width": 2400,
-    "height": 1802
+    "height": 1802,
+    "material": true
   },
   {
     "source": "Elegancia 01.png",
@@ -482,7 +484,8 @@
       "el": "Ανάγλυφο μαξιλάρι στο κρεβάτι δίπλα σε πλεκτό φωτιστικό"
     },
     "width": 1802,
-    "height": 2400
+    "height": 2400,
+    "material": true
   },
   {
     "source": "ioannisbouklis-543.JPG",
@@ -559,7 +562,8 @@
       "el": "Επίτοιχη μπαταρία πάνω από τον νιπτήρα, κοντινό πλάνο"
     },
     "width": 1802,
-    "height": 2400
+    "height": 2400,
+    "material": true
   },
   {
     "source": "ioannisbouklis-535.JPG",

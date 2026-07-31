@@ -44,6 +44,13 @@ export type Dictionary = {
     cta: string
   }
   about: { eyebrow: string; heading: string; paragraphs: string[] }
+  /* Four materials, each with one close-up. This is what the detail
+     photographs are for — they say more about the aesthetic than prose can. */
+  materials: {
+    eyebrow: string
+    heading: string
+    items: { name: string; note: string; photo: string }[]
+  }
   /* The villas section was removed — three identical villas gave it nothing
      useful to say. The names survive only to populate the contact form's
      "which villa interests you?" dropdown. */
@@ -123,17 +130,27 @@ const en: Dictionary = {
   },
   about: {
     eyebrow: 'The complex',
-    heading: 'A quiet address between mountain and sea',
+    heading: 'Quiet, by design',
     paragraphs: [
-      'Elegancia is three private villas in Skotina, set where the foothills of Mount Olympus settle towards the Aegean. The complex is small by design — three houses, three pools, no shared lobby and no reception desk. What you get instead is the quiet of a private residence with the coast a short drive away.',
-      'Each villa sleeps up to six across two master bedrooms, with two bathrooms, a fully equipped kitchen and its own pool and hot tub. Self check-in by lockbox means you arrive on your own schedule.',
-      'The interiors are deliberately understated — microcement, pale oak, natural stone and linen in a Mediterranean palette of cream, sand and bronze. Nothing competes with the view. The intention throughout is restraint rather than display.',
+      'Three houses on the slope between Olympus and the sea. Three pools. No lobby, no reception desk.',
+      'Each villa sleeps six. Two master bedrooms, two bathrooms, a kitchen you can properly cook in. You let yourself in.',
+      'The coast is fifteen minutes down the hill.',
+    ],
+  },
+  materials: {
+    eyebrow: 'Made of',
+    heading: 'Four materials, nothing more',
+    items: [
+      { name: 'Natural stone', note: 'Quarried in Pieria.', photo: 'living-stone-wall.jpg' },
+      { name: 'Pale oak', note: 'Matte. Unlacquered.', photo: 'kitchen-shelf.jpg' },
+      { name: 'Microcement', note: 'Seamless. Cool underfoot.', photo: 'bathroom-tap-detail.jpg' },
+      { name: 'Linen', note: 'Washed. Heavy. Slow to crease.', photo: 'bedroom-cushion-detail.jpg' },
     ],
   },
   villas: { names: ['Villa 1', 'Villa 2', 'Villa 3'] },
   highlights: {
     eyebrow: 'Highlights',
-    heading: 'What matters most',
+    heading: 'What matters',
     items: [
       { label: 'Private pool', icon: 'pool' },
       { label: 'Private hot tub', icon: 'hottub' },
@@ -151,7 +168,7 @@ const en: Dictionary = {
   },
   amenities: {
     eyebrow: 'Amenities',
-    heading: 'Everything already in place',
+    heading: 'Already here',
     groups: [
       { title: 'Outdoors', items: ['Private pool', 'Private hot tub', 'Sun loungers', 'Lounge area', 'BBQ', 'Outdoor dining', 'Garden', 'Private parking'] },
       { title: 'Living room', items: ['Smart TV', 'Sofa bed'] },
@@ -161,7 +178,7 @@ const en: Dictionary = {
       { title: 'Also included', items: ['Wi-Fi', 'Self check-in', 'Lockbox', 'Washing machine', 'Iron', 'Baby cot on request'] },
     ],
     stayNote:
-      'Check-in is 15:00 – 22:00 and check-out is until 11:00. Self check-in by lockbox. Full house rules are provided on arrival.',
+      'Check-in 15:00 – 22:00. Check-out by 11:00. Self check-in by lockbox.',
   },
   gallery: {
     eyebrow: 'Gallery',
@@ -186,9 +203,9 @@ const en: Dictionary = {
   },
   contact: {
     eyebrow: 'Enquiries',
-    heading: 'Ask us anything',
+    heading: 'Ask us',
     body:
-      'For availability and rates the fastest route is Booking.com. For longer stays, or anything the site does not answer, write to us directly.',
+      'Availability and rates are on Booking.com. For anything else, write to us.',
     emailLabel: 'Email',
     phoneLabel: 'Telephone',
     addressLabel: 'Address',
@@ -250,11 +267,21 @@ const el: Dictionary = {
   },
   about: {
     eyebrow: 'Το συγκρότημα',
-    heading: 'Ένας ήσυχος προορισμός ανάμεσα στο βουνό και τη θάλασσα',
+    heading: 'Ήσυχα, από επιλογή',
     paragraphs: [
-      'Η Elegancia είναι τρεις ιδιωτικές βίλες στη Σκοτίνα, εκεί όπου οι πλαγιές του Ολύμπου κατεβαίνουν προς το Αιγαίο. Το συγκρότημα είναι μικρό από επιλογή — τρία σπίτια, τρεις πισίνες, χωρίς κοινόχρηστη υποδοχή. Αυτό που κερδίζετε είναι η ησυχία μιας ιδιωτικής κατοικίας, με την παραλία λίγα λεπτά μακριά.',
-      'Κάθε βίλα φιλοξενεί έως έξι επισκέπτες σε δύο master υπνοδωμάτια, με δύο μπάνια, πλήρως εξοπλισμένη κουζίνα και δική της πισίνα και υδρομασάζ. Με self check-in μέσω lockbox, φτάνετε στον δικό σας χρόνο.',
-      'Οι εσωτερικοί χώροι είναι σκόπιμα λιτοί — microcement, ανοιχτή δρυς, φυσική πέτρα και λινά, σε μια μεσογειακή παλέτα από κρεμ, άμμο και μπρονζέ. Τίποτα δεν ανταγωνίζεται τη θέα. Η πρόθεση παντού είναι η εγκράτεια, όχι η επίδειξη.',
+      'Τρία σπίτια στην πλαγιά, ανάμεσα στον Όλυμπο και τη θάλασσα. Τρεις πισίνες. Χωρίς υποδοχή.',
+      'Κάθε βίλα φιλοξενεί έξι. Δύο master υπνοδωμάτια, δύο μπάνια, κουζίνα για πραγματικό μαγείρεμα. Μπαίνετε μόνοι σας.',
+      'Η παραλία είναι δεκαπέντε λεπτά πιο κάτω.',
+    ],
+  },
+  materials: {
+    eyebrow: 'Υλικά',
+    heading: 'Τέσσερα υλικά, τίποτα άλλο',
+    items: [
+      { name: 'Φυσική πέτρα', note: 'Από την Πιερία.', photo: 'living-stone-wall.jpg' },
+      { name: 'Ανοιχτή δρυς', note: 'Ματ. Χωρίς βερνίκι.', photo: 'kitchen-shelf.jpg' },
+      { name: 'Microcement', note: 'Χωρίς αρμούς. Δροσερό.', photo: 'bathroom-tap-detail.jpg' },
+      { name: 'Λινό', note: 'Πλυμένο. Βαρύ. Δεν τσαλακώνει.', photo: 'bedroom-cushion-detail.jpg' },
     ],
   },
   villas: { names: ['Βίλα 1', 'Βίλα 2', 'Βίλα 3'] },
@@ -278,7 +305,7 @@ const el: Dictionary = {
   },
   amenities: {
     eyebrow: 'Παροχές',
-    heading: 'Όλα στη θέση τους',
+    heading: 'Όλα εδώ',
     groups: [
       { title: 'Εξωτερικοί χώροι', items: ['Ιδιωτική πισίνα', 'Ιδιωτικό υδρομασάζ', 'Ξαπλώστρες', 'Χώρος lounge', 'BBQ', 'Εξωτερική τραπεζαρία', 'Κήπος', 'Ιδιωτικό πάρκινγκ'] },
       { title: 'Σαλόνι', items: ['Smart TV', 'Καναπές-κρεβάτι'] },
@@ -288,7 +315,7 @@ const el: Dictionary = {
       { title: 'Επιπλέον', items: ['Wi-Fi', 'Self check-in', 'Lockbox', 'Πλυντήριο ρούχων', 'Σίδερο', 'Βρεφική κούνια (κατόπιν αιτήματος)'] },
     ],
     stayNote:
-      'Το check-in είναι 15:00 – 22:00 και το check-out έως τις 11:00. Self check-in μέσω lockbox. Οι πλήρεις κανόνες διαμονής παρέχονται κατά την άφιξη.',
+      'Check-in 15:00 – 22:00. Check-out έως 11:00. Self check-in με lockbox.',
   },
   gallery: {
     eyebrow: 'Φωτογραφίες',
@@ -313,9 +340,9 @@ const el: Dictionary = {
   },
   contact: {
     eyebrow: 'Επικοινωνία',
-    heading: 'Ρωτήστε μας οτιδήποτε',
+    heading: 'Ρωτήστε μας',
     body:
-      'Για διαθεσιμότητα και τιμές, ο γρηγορότερος δρόμος είναι το Booking.com. Για μεγαλύτερες διαμονές ή για ό,τι δεν απαντά η ιστοσελίδα, γράψτε μας απευθείας.',
+      'Διαθεσιμότητα και τιμές στο Booking.com. Για οτιδήποτε άλλο, γράψτε μας.',
     emailLabel: 'Email',
     phoneLabel: 'Τηλέφωνο',
     addressLabel: 'Διεύθυνση',
