@@ -51,11 +51,11 @@ export function Hero({ locale }: { locale: Locale }) {
         the bottom. The gradient therefore holds >=0.85 alpha up to 65% from the
         bottom, and only lightens above that:
 
-            0%  (bottom) 0.95    -> sand 11.4:1 worst case
-           45%           0.92
-           65%           0.85    -> sand  8.2:1 worst case, still AA
-           85%           0.45    -> no text here
-          100% (top)     0.25    -> photograph clearly visible
+            0%  (bottom) 0.80
+           45%           0.74
+           65%           0.58    -> lightest point still overlapped by text
+           85%           0.22    -> no text here
+          100% (top)     0.06    -> photograph essentially unveiled
 
         scripts/a11y-audit.mjs verifies this by sampling the ACTUAL rendered
         pixels behind each text element rather than trusting these numbers, so
@@ -66,7 +66,25 @@ export function Hero({ locale }: { locale: Locale }) {
       */}
       <div
         aria-hidden="true"
-        className="absolute inset-0 -z-10 bg-[linear-gradient(to_top,rgba(31,27,23,0.95)_0%,rgba(31,27,23,0.92)_45%,rgba(31,27,23,0.85)_65%,rgba(31,27,23,0.45)_85%,rgba(31,27,23,0.25)_100%)]"
+        className="absolute inset-0 -z-10 bg-[linear-gradient(to_top,rgba(31,27,23,0.80)_0%,rgba(31,27,23,0.74)_45%,rgba(31,27,23,0.58)_65%,rgba(31,27,23,0.22)_85%,rgba(31,27,23,0.06)_100%)]"
+      />
+
+      {/*
+        Second, LOCALISED wash behind the text column.
+
+        Lightening the vertical scrim dropped the 12px eyebrow to 3.76:1 against
+        a bright window in the photograph — measured, not guessed. Re-darkening
+        the whole image would have undone the point of lightening it, so instead
+        this darkens only the left third, where all the text sits. The pool and
+        architecture on the right stay bright.
+
+        Alphas compose: at the eyebrow the vertical scrim is ~0.58 and this adds
+        0.60, giving an effective 1-(1-0.58)(1-0.60) = 0.83 exactly where it is
+        needed. Verified by the pixel sampler in scripts/a11y-audit.mjs.
+      */}
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 -z-10 bg-[linear-gradient(to_right,rgba(31,27,23,0.60)_0%,rgba(31,27,23,0.45)_35%,rgba(31,27,23,0)_70%)]"
       />
 
       <motion.div

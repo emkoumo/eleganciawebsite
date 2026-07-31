@@ -35,7 +35,15 @@ export type Dictionary = {
   bookOnBooking: string
   hero: { location: string; headline: string; subtext: string; cta: string }
   about: { eyebrow: string; heading: string; paragraphs: string[] }
-  villas: { eyebrow: string; heading: string; body: string; names: [string, string, string]; identical: string }
+  villas: {
+    eyebrow: string
+    heading: string
+    body: string
+    names: [string, string, string]
+    /* Capacity ladder: the point of three identical villas is that they
+       combine, so this is the one genuinely useful thing to say about them. */
+    capacity: { villas: string; guests: string; note: string }[]
+  }
   highlights: { eyebrow: string; heading: string; items: { label: string; icon: AmenityIcon }[] }
   amenities: {
     eyebrow: string
@@ -47,6 +55,8 @@ export type Dictionary = {
     eyebrow: string
     heading: string
     filterLabel: string
+    showAll: (n: number) => string
+    showFewer: string
     filters: { id: string; label: string }[]
     showing: (n: number) => string
     viewLarger: (alt: string) => string
@@ -114,11 +124,15 @@ const en: Dictionary = {
   },
   villas: {
     eyebrow: 'The villas',
-    heading: 'Three villas, one standard',
+    heading: 'Book one, or take all three',
     body:
-      'The three villas are identical in layout, size and specification — same two master bedrooms, same two bathrooms, same private pool and hot tub. There is no better or worse one to book, so choose on availability alone.',
+      'The three villas are identical — same two master bedrooms, same two bathrooms, same private pool and hot tub. There is no better or worse one, so there is nothing to weigh up. What that does give you is scale: book one villa, or take the whole complex and have the place to yourselves.',
     names: ['Villa 1', 'Villa 2', 'Villa 3'],
-    identical: 'Identical in layout and amenities',
+    capacity: [
+      { villas: 'One villa', guests: '6 guests', note: 'Two master bedrooms, two bathrooms, private pool and hot tub.' },
+      { villas: 'Two villas', guests: '12 guests', note: 'Adjoining plots — two families, together but not on top of each other.' },
+      { villas: 'All three', guests: '18 guests', note: 'Exclusive use of the entire complex. No other guests on site.' },
+    ],
   },
   highlights: {
     eyebrow: 'Highlights',
@@ -156,6 +170,8 @@ const en: Dictionary = {
     eyebrow: 'Gallery',
     heading: 'Look around',
     filterLabel: 'Filter photographs by area',
+    showAll: (n) => `Show all ${n} photographs`,
+    showFewer: 'Show fewer',
     filters: [
       { id: 'all', label: 'All' },
       { id: 'outdoor', label: 'Pool & garden' },
@@ -242,11 +258,15 @@ const el: Dictionary = {
   },
   villas: {
     eyebrow: 'Οι βίλες',
-    heading: 'Τρεις βίλες, μία ποιότητα',
+    heading: 'Μία βίλα ή και οι τρεις',
     body:
-      'Οι τρεις βίλες είναι πανομοιότυπες σε διαρρύθμιση, μέγεθος και εξοπλισμό — ίδια δύο master υπνοδωμάτια, ίδια δύο μπάνια, ίδια ιδιωτική πισίνα και υδρομασάζ. Δεν υπάρχει καλύτερη ή χειρότερη επιλογή, επιλέξτε απλώς με βάση τη διαθεσιμότητα.',
+      'Οι τρεις βίλες είναι πανομοιότυπες — ίδια δύο master υπνοδωμάτια, ίδια δύο μπάνια, ίδια ιδιωτική πισίνα και υδρομασάζ. Δεν υπάρχει καλύτερη ή χειρότερη, άρα δεν έχετε τίποτα να ζυγίσετε. Αυτό που κερδίζετε είναι η κλίμακα: κλείστε μία βίλα ή ολόκληρο το συγκρότημα και έχετε τον χώρο μόνο για εσάς.',
     names: ['Βίλα 1', 'Βίλα 2', 'Βίλα 3'],
-    identical: 'Πανομοιότυπες σε διαρρύθμιση και παροχές',
+    capacity: [
+      { villas: 'Μία βίλα', guests: '6 επισκέπτες', note: 'Δύο master υπνοδωμάτια, δύο μπάνια, ιδιωτική πισίνα και υδρομασάζ.' },
+      { villas: 'Δύο βίλες', guests: '12 επισκέπτες', note: 'Γειτονικά οικόπεδα — δύο οικογένειες μαζί, με την άνεσή τους.' },
+      { villas: 'Και οι τρεις', guests: '18 επισκέπτες', note: 'Αποκλειστική χρήση όλου του συγκροτήματος. Κανείς άλλος επισκέπτης.' },
+    ],
   },
   highlights: {
     eyebrow: 'Τα σημαντικά',
@@ -284,6 +304,8 @@ const el: Dictionary = {
     eyebrow: 'Φωτογραφίες',
     heading: 'Ρίξτε μια ματιά',
     filterLabel: 'Φιλτράρισμα φωτογραφιών ανά χώρο',
+    showAll: (n) => `Δείτε όλες τις ${n} φωτογραφίες`,
+    showFewer: 'Δείτε λιγότερες',
     filters: [
       { id: 'all', label: 'Όλες' },
       { id: 'outdoor', label: 'Πισίνα & κήπος' },

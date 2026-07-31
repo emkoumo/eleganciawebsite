@@ -16,11 +16,12 @@ export function Gallery({ locale }: { locale: Locale }) {
      arbitrary splits as meaningful. Area is the distinction a visitor actually
      wants — "show me the bathrooms". */
   const [filter, setFilter] = useState<string>('all')
+  const [expanded, setExpanded] = useState(false)
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
   const reduce = useReducedMotion()
   const itemVariants = useGalleryItemVariants()
 
-  const visible = useMemo(
+  const filtered = useMemo(
     () =>
       filter === 'all'
         ? galleryPhotos
@@ -28,9 +29,19 @@ export function Gallery({ locale }: { locale: Locale }) {
     [filter],
   )
 
+  /* 53 photographs in one grid is an enormous scroll, especially on a phone
+     where only two fit per row. Showing a first tranche keeps the section
+     skimmable and lets a visitor reach the contact form; the rest is one tap
+     away. The lightbox still receives the FULL filtered set, so arrow-key
+     navigation runs past the visible tranche rather than dead-ending. */
+  const INITIAL = 12
+  const visible = expanded ? filtered : filtered.slice(0, INITIAL)
+  const hidden = filtered.length - visible.length
+
   /* Closing the lightbox on a filter change avoids stale indices. */
   const changeFilter = (next: string) => {
     setLightboxIndex(null)
+    setExpanded(false)
     setFilter(next)
   }
 
@@ -87,7 +98,7 @@ export function Gallery({ locale }: { locale: Locale }) {
         {/* Result count, announced on filter change — gives non-visual users
             the feedback the crossfade gives sighted ones. */}
         <p aria-live="polite" className="mt-5 text-sm text-bronze-deep">
-          {d.gallery.showing(visible.length)}
+          {d.gallery.showing(filtered.length)}
         </p>
 
         {/*
@@ -98,7 +109,7 @@ export function Gallery({ locale }: { locale: Locale }) {
           leaves. `layout` is off under reduced motion so tiles crossfade in
           place instead of sliding across the viewport.
         */}
-        <ul className="mt-8 grid auto-rows-[7rem] grid-flow-row-dense grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
+        <ul id="gallery-grid" className="mt-8 grid auto-rows-[4rem] grid-flow-row-dense grid-cols-2 gap-3 sm:auto-rows-[5rem] sm:gap-4 md:auto-rows-[6rem] md:grid-cols-3 lg:auto-rows-[7rem] lg:grid-cols-4">
           <AnimatePresence mode="popLayout" initial={false}>
             {visible.map((photo, i) => (
               <motion.li
@@ -108,7 +119,14 @@ export function Gallery({ locale }: { locale: Locale }) {
                 initial="hidden"
                 animate="visible"
                 exit="exit"
-                className={isPortrait(photo) ? 'row-span-4' : 'row-span-3'}
+                /* Shorter spans on small screens. At 2 columns a portrait tile
+                   spanning 4 rows was ~28rem tall, which made the section an
+                   endless scroll on a phone. */
+                className={
+                  isPortrait(photo)
+                    ? 'row-span-3 md:row-span-4'
+                    : 'row-span-2 md:row-span-3'
+                }
               >
                 <button
                   type="button"
@@ -134,10 +152,36 @@ export function Gallery({ locale }: { locale: Locale }) {
             ))}
           </AnimatePresence>
         </ul>
+
+        {(hidden > 0 || expanded) && (
+          <div className="mt-10 flex justify-center">
+            <button
+              type="button"
+              onClick={() => setExpanded((v) => !v)}
+              aria-expanded={expanded}
+              aria-controls="gallery-grid"
+              className="tap-target inline-flex cursor-pointer items-center gap-2 rounded-sm border border-bronze/40 px-6 text-sm font-medium text-bronze-deep transition-colors duration-200 hover:border-bronze hover:bg-bronze/10"
+            >
+              {expanded ? d.gallery.showFewer : d.gallery.showAll(filtered.length)}
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 16 16"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                aria-hidden="true"
+                className={expanded ? 'rotate-180' : undefined}
+              >
+                <path d="M8 3v10M4 9l4 4 4-4" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </button>
+          </div>
+        )}
       </div>
 
       <Lightbox
-        photos={visible}
+        photos={filtered}
         index={lightboxIndex}
         locale={locale}
         onClose={() => setLightboxIndex(null)}
