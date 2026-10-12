@@ -80,17 +80,13 @@ export function Footer({ locale }: { locale: Locale }) {
               </li>
             </ul>
 
+            {/* Points at the contact section rather than Booking.com — every
+                route off this page now ends with the owners, not a platform. */}
             <a
-              href={site.bookingUrl}
-              target="_blank"
-              rel="noopener noreferrer"
+              href="#contact"
               className="tap-target mt-6 inline-flex cursor-pointer items-center rounded-sm border border-champagne px-5 text-sm font-medium transition-colors duration-200 hover:bg-champagne hover:text-espresso"
             >
               {d.nav.book}
-              <span className="sr-only">
-                {' '}
-                {d.bookOnBooking} {d.opensNewTab}
-              </span>
             </a>
           </div>
         </div>

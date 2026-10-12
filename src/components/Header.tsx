@@ -1,7 +1,8 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { site } from '@/lib/site'
 import { EspaBanner } from '@/components/EspaBanner'
 import { getDictionary, localePath, type Locale } from '@/lib/i18n'
@@ -23,12 +24,11 @@ export function Header({ locale }: { locale: Locale }) {
      A semi-transparent background does not fix this: contrast can only resolve
      against an opaque ancestor, so any alpha below 1 still falls through to
      body. Opaque is the only honest answer.
-
-     Hover is white, not champagne — champagne reaches only 3.53:1 over the
-     hero scrim, below the 4.5:1 small-text floor.
      --------------------------------------------------------------------- */
   const [menuOpen, setMenuOpen] = useState(false)
   const toggleRef = useRef<HTMLButtonElement>(null)
+  const panelRef = useRef<HTMLDivElement>(null)
+  const reduce = useReducedMotion()
   const d = getDictionary(locale)
   const other: Locale = locale === 'en' ? 'el' : 'en'
   const home = localePath(locale)
@@ -43,23 +43,107 @@ export function Header({ locale }: { locale: Locale }) {
     { href: '#contact', label: d.nav.contact },
   ]
 
-  /* Escape closes the mobile menu and returns focus to the toggle that opened
-     it, so keyboard focus is never left orphaned. */
+  const close = useCallback(() => {
+    setMenuOpen(false)
+    toggleRef.current?.focus()
+  }, [])
+
+  /* Escape closes and returns focus to the toggle, and Tab is kept inside the
+     panel. A full-screen overlay that leaves focus behind it is worse than no
+     overlay: a keyboard user tabs into links they cannot see. */
   useEffect(() => {
     if (!menuOpen) return
+
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        setMenuOpen(false)
-        toggleRef.current?.focus()
+        e.preventDefault()
+        close()
+        return
+      }
+      if (e.key !== 'Tab') return
+
+      const focusables = panelRef.current?.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled])',
+      )
+      if (!focusables?.length) return
+      const first = focusables[0]
+      const last = focusables[focusables.length - 1]
+
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault()
+        last.focus()
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault()
+        first.focus()
       }
     }
+
     document.addEventListener('keydown', onKey)
     return () => document.removeEventListener('keydown', onKey)
+  }, [menuOpen, close])
+
+  /* Lock background scroll while the overlay is up, compensating for the
+     scrollbar so the page underneath does not jump sideways. */
+  useEffect(() => {
+    if (!menuOpen) return
+    const { overflow, paddingRight } = document.body.style
+    const scrollbar = window.innerWidth - document.documentElement.clientWidth
+    document.body.style.overflow = 'hidden'
+    if (scrollbar > 0) document.body.style.paddingRight = `${scrollbar}px`
+    return () => {
+      document.body.style.overflow = overflow
+      document.body.style.paddingRight = paddingRight
+    }
   }, [menuOpen])
 
-  /* Solid espresso throughout, so `on-dark` keeps focus rings champagne and
-     every pairing resolves against a known opaque background:
-     sand 12.97:1, champagne 5.62:1, white 12.63:1. */
+  /* Move focus into the panel on open, so the first Tab lands on a menu item
+     rather than somewhere behind the overlay. */
+  useEffect(() => {
+    if (!menuOpen) return
+    const raf = requestAnimationFrame(() =>
+      panelRef.current?.querySelector<HTMLElement>('a[href]')?.focus(),
+    )
+    return () => cancelAnimationFrame(raf)
+  }, [menuOpen])
+
+  /* Reduced motion: the panel still appears, it just stops travelling. The
+     brief's contract is opacity-only or instant — no slide, no stagger. */
+  const panelVariants = reduce
+    ? {
+        hidden: { opacity: 0 },
+        visible: { opacity: 1, transition: { duration: 0.001 } },
+        exit: { opacity: 0, transition: { duration: 0.001 } },
+      }
+    : {
+        hidden: { opacity: 0, clipPath: 'inset(0% 0% 100% 0%)' },
+        visible: {
+          opacity: 1,
+          clipPath: 'inset(0% 0% 0% 0%)',
+          transition: {
+            duration: 0.55,
+            ease: [0.22, 1, 0.36, 1] as const,
+            staggerChildren: 0.06,
+            delayChildren: 0.18,
+          },
+        },
+        exit: {
+          opacity: 0,
+          clipPath: 'inset(0% 0% 100% 0%)',
+          transition: { duration: 0.35, ease: [0.4, 0, 0.2, 1] as const },
+        },
+      }
+
+  const itemVariants = reduce
+    ? { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { duration: 0.001 } } }
+    : {
+        hidden: { opacity: 0, y: 24 },
+        visible: {
+          opacity: 1,
+          y: 0,
+          transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] as const },
+        },
+      }
+
   return (
     /*
       `absolute`, not `fixed`: the header scrolls away with the page instead of
@@ -69,10 +153,7 @@ export function Header({ locale }: { locale: Locale }) {
       It overlays the top of the hero, so header height + hero height is exactly
       one viewport — the hero can simply be min-h-svh and there is no strip of
       the next section showing under it. A static header would stack above the
-      hero and push 100svh of photograph partly below the fold, which is the gap
-      at the bottom of the screen this replaces. Doing that arithmetic in CSS
-      instead would mean hard-coding a header height that changes with the
-      banner's width at every breakpoint.
+      hero and push 100svh of photograph partly below the fold.
     */
     <header className="on-dark absolute inset-x-0 top-0 z-40 border-b border-champagne/15 bg-espresso">
       {/* EU/ESPA acknowledgement sits above the nav, inside the banner
@@ -110,104 +191,172 @@ export function Header({ locale }: { locale: Locale }) {
                 </a>
               </li>
             ))}
-            <li>
-              <LocaleSwitch locale={other} label={d.switchTo} aria={d.switchToAria} />
-            </li>
-            <li className="ml-1">
+            {/* Points at the contact section, not Booking.com. Direct booking
+                is the goal, so the most prominent control on the page should
+                not hand the guest to a platform. */}
+            <li className="ml-2">
               <a
-                href={site.bookingUrl}
-                target="_blank"
-                rel="noopener noreferrer"
+                href="#contact"
                 className="tap-target inline-flex cursor-pointer items-center rounded-sm border border-champagne px-5 text-sm font-medium text-sand transition-colors duration-200 hover:bg-champagne hover:text-espresso"
               >
                 {d.nav.book}
-                <span className="sr-only">
-                  {' '}
-                  {d.bookOnBooking} {d.opensNewTab}
-                </span>
               </a>
+            </li>
+            <li>
+              <LocaleRule />
+            </li>
+            <li>
+              <LocaleSwitch locale={other} label={d.switchToShort} aria={d.switchToAria} />
             </li>
           </ul>
         </nav>
 
-        <div className="flex items-center gap-1 lg:hidden">
-          <LocaleSwitch locale={other} label={d.switchTo} aria={d.switchToAria} />
-          <button
+        {/* Mobile: menu button, then the rule, then the language — the order
+            asked for. */}
+        <div className="flex items-center lg:hidden">
+          <MenuButton
             ref={toggleRef}
-            type="button"
+            open={menuOpen}
+            label={menuOpen ? d.menuClose : d.menuOpen}
             onClick={() => setMenuOpen((v) => !v)}
-            aria-expanded={menuOpen}
-            aria-controls="mobile-menu"
-            className="tap-target -mr-2 flex cursor-pointer items-center justify-center text-sand"
-          >
-            <span className="sr-only">
-              {menuOpen
-                ? locale === 'en' ? 'Close menu' : 'Κλείσιμο μενού'
-                : locale === 'en' ? 'Open menu' : 'Άνοιγμα μενού'}
-            </span>
-            <svg
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              aria-hidden="true"
-            >
-              {menuOpen ? (
-                <path d="M6 6l12 12M18 6L6 18" strokeLinecap="round" />
-              ) : (
-                <path d="M4 7h16M4 12h16M4 17h16" strokeLinecap="round" />
-              )}
-            </svg>
-          </button>
+          />
+          <LocaleRule />
+          <LocaleSwitch locale={other} label={d.switchToShort} aria={d.switchToAria} />
         </div>
       </div>
 
-      {/* `hidden` keeps the closed menu out of the tab order entirely. */}
-      <div
-        id="mobile-menu"
-        hidden={!menuOpen}
-        className="border-t border-champagne/20 bg-espresso lg:hidden"
-      >
-        <nav aria-label={locale === 'en' ? 'Primary (mobile)' : 'Κύρια πλοήγηση (κινητό)'}>
-          <ul className="mx-auto max-w-6xl px-6 py-2">
-            {navLinks.map((link) => (
-              <li key={link.href}>
+      {/*
+        Full-screen menu.
+
+        AnimatePresence rather than a `hidden` attribute, so the panel is not in
+        the DOM at all when closed — nothing to tab into, and the exit animation
+        gets to finish before it unmounts.
+
+        The reveal is a clip-path wipe upward from the bottom edge plus a
+        staggered rise on the items. Items carry no `data-reveal`, because they
+        are user-triggered: the no-JS stylesheet override exists to rescue
+        scroll reveals that would otherwise be stuck invisible, and with JS off
+        this panel never renders in the first place.
+      */}
+      <AnimatePresence>
+        {menuOpen && (
+          <motion.div
+            ref={panelRef}
+            id="mobile-menu"
+            role="dialog"
+            aria-modal="true"
+            aria-label={d.menuTitle}
+            variants={panelVariants}
+            initial="hidden"
+            animate="visible"
+            exit="exit"
+            className="fixed inset-0 z-50 flex flex-col bg-espresso lg:hidden"
+          >
+            <div className="flex items-center justify-between px-6 py-5">
+              <Image
+                src="/logos/elegancia-logo-light.svg"
+                alt=""
+                width={545}
+                height={138}
+                className="h-8 w-auto"
+              />
+              <MenuButton open label={d.menuClose} onClick={close} />
+            </div>
+
+            <nav
+              aria-label={locale === 'en' ? 'Primary (mobile)' : 'Κύρια πλοήγηση (κινητό)'}
+              className="flex flex-1 flex-col justify-center px-6 pb-16"
+            >
+              <ul className="space-y-1">
+                {navLinks.map((link) => (
+                  <motion.li key={link.href} variants={itemVariants}>
+                    <a
+                      href={link.href}
+                      onClick={close}
+                      className="block py-3 text-[clamp(2rem,9vw,2.75rem)] font-extralight leading-tight tracking-[-0.02em] text-sand transition-colors duration-200 hover:text-white"
+                    >
+                      {link.label}
+                    </a>
+                  </motion.li>
+                ))}
+              </ul>
+
+              <motion.div variants={itemVariants} className="mt-12 space-y-3">
                 <a
-                  href={link.href}
-                  onClick={() => setMenuOpen(false)}
-                  className="tap-target flex items-center border-b border-champagne/15 text-base text-sand transition-colors duration-200 hover:text-white"
+                  href="#contact"
+                  onClick={close}
+                  className="tap-target inline-flex w-full cursor-pointer items-center justify-center rounded-sm bg-sand px-6 text-sm font-medium text-espresso transition-colors duration-200 hover:bg-champagne"
                 >
-                  {link.label}
+                  {d.nav.book}
                 </a>
-              </li>
-            ))}
-            <li className="py-4">
-              <a
-                href={site.bookingUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => setMenuOpen(false)}
-                className="tap-target inline-flex cursor-pointer items-center rounded-sm border border-champagne px-5 text-sm font-medium text-sand"
-              >
-                {d.nav.book}
-                <span className="sr-only">
-                  {' '}
-                  {d.bookOnBooking} {d.opensNewTab}
-                </span>
-              </a>
-            </li>
-          </ul>
-        </nav>
-      </div>
+                <a
+                  href={`tel:${site.contact.phone}`}
+                  onClick={close}
+                  className="tap-target inline-flex w-full cursor-pointer items-center justify-center rounded-sm border border-champagne px-6 text-sm font-medium text-sand transition-colors duration-200 hover:bg-champagne hover:text-espresso"
+                >
+                  {site.contact.phoneDisplay}
+                </a>
+              </motion.div>
+            </nav>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
+  )
+}
+
+/* A hairline between the menu button and the language, as asked. Decorative:
+   it separates two controls that are already distinct to a screen reader. */
+function LocaleRule() {
+  return <span aria-hidden="true" className="mx-1 h-5 w-px shrink-0 bg-champagne/40" />
+}
+
+/* Two lines that cross into an X rather than the usual three-line burger. The
+   middle line of a three-line icon has nowhere to go on close — it either
+   fades (which reads as a glitch at this size) or rotates onto one of the
+   others. Two lines animate cleanly and leave the mark calmer when closed. */
+function MenuButton({
+  open,
+  label,
+  onClick,
+  ref,
+}: {
+  open: boolean
+  label: string
+  onClick: () => void
+  ref?: React.Ref<HTMLButtonElement>
+}) {
+  return (
+    <button
+      ref={ref}
+      type="button"
+      onClick={onClick}
+      aria-expanded={open}
+      aria-controls="mobile-menu"
+      className="tap-target group -ml-2 flex cursor-pointer items-center justify-center text-sand"
+    >
+      <span className="sr-only">{label}</span>
+      <span aria-hidden="true" className="relative block h-4 w-6">
+        <span
+          className={`absolute left-0 block h-px w-6 bg-current transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none ${
+            open ? 'top-1/2 rotate-45' : 'top-1 group-hover:top-0.5'
+          }`}
+        />
+        <span
+          className={`absolute left-0 block h-px bg-current transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none ${
+            open ? 'top-1/2 w-6 -rotate-45' : 'bottom-1 w-4 group-hover:bottom-0.5 group-hover:w-6'
+          }`}
+        />
+      </span>
+    </button>
   )
 }
 
 /* A plain link, not a button: switching locale is a navigation to a different
    URL, so it must behave like one (middle-click, open in new tab, bookmark).
-   hrefLang tells assistive tech and crawlers what is on the other end. */
+   hrefLang tells assistive tech and crawlers what is on the other end. The
+   visible label is the two-letter code; the full sentence lives in aria-label,
+   so "ΕΛ" is never announced as a word. */
 function LocaleSwitch({
   locale,
   label,
@@ -223,7 +372,7 @@ function LocaleSwitch({
       hrefLang={locale}
       lang={locale}
       aria-label={aria}
-      className="tap-target inline-flex cursor-pointer items-center px-3 text-sm font-medium text-champagne transition-colors duration-200 hover:text-white"
+      className="tap-target inline-flex cursor-pointer items-center px-2 text-sm font-medium tracking-wide text-champagne transition-colors duration-200 hover:text-white"
     >
       {label}
     </a>

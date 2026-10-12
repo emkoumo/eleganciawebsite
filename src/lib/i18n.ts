@@ -31,11 +31,15 @@ export type Dictionary = {
   localeName: string
   /** Label on the link to the OTHER locale. */
   switchTo: string
+  /** Two-letter form used in the header, where space is tight. */
+  switchToShort: string
   switchToAria: string
+  menuOpen: string
+  menuClose: string
+  menuTitle: string
   skipToMain: string
   nav: { about: string; amenities: string; gallery: string; contact: string; book: string }
   opensNewTab: string
-  bookOnBooking: string
   /* Search-result description. Its own string rather than a join of hero
      fragments: it has to read as one sentence to a stranger who has not seen
      the page, and it must survive the hero copy being rewritten. ~155
@@ -85,11 +89,12 @@ export type Dictionary = {
     body: string
     callLabel: string
     whatsappLabel: string
+    emailIntro: string
+    mapLink: string
     /** Prefilled into the WhatsApp composer, so the guest starts mid-sentence. */
     whatsappMessage: string
     emailLabel: string
     addressLabel: string
-    bookingLink: string
     responseNote: string
   }
   footer: { stay: string; checkIn: string; checkOut: string; contact: string; rights: string }
@@ -106,11 +111,14 @@ const en: Dictionary = {
   htmlLang: 'en',
   localeName: 'English',
   switchTo: 'Ελληνικά',
+  switchToShort: 'ΕΛ',
   switchToAria: 'Switch language to Greek',
+  menuOpen: 'Open menu',
+  menuClose: 'Close menu',
+  menuTitle: 'Menu',
   skipToMain: 'Skip to main content',
   nav: { about: 'About', amenities: 'Amenities', gallery: 'Gallery', contact: 'Contact', book: 'Book' },
   opensNewTab: '(opens in a new tab)',
-  bookOnBooking: 'on Booking.com',
   metaDescription:
     'Three private villas on the slope between Mount Olympus and the Aegean, each with its own pool and hot tub, for up to six guests. Skotina, Pieria.',
   hero: {
@@ -223,16 +231,17 @@ const en: Dictionary = {
     counter: (i, n) => `Photograph ${i} of ${n}`,
   },
   contact: {
-    eyebrow: 'Contact',
-    heading: 'Talk to us directly',
+    eyebrow: 'Book direct',
+    heading: 'One message, one answer',
     body:
-      'Dates and rates live on Booking.com. For everything else — a question about the house, a late ferry, six of you and a cot — it is quicker to just ask.',
+      'Book with us and there is no platform in between — you talk to the people who own the houses. Ask about dates, prices, a late arrival, six of you and a cot.',
     callLabel: 'Call us',
-    whatsappLabel: 'Message on WhatsApp',
-    whatsappMessage: 'Hello! I have a question about staying at Elegancia.',
-    emailLabel: 'Email us',
+    whatsappLabel: 'Message us',
+    whatsappMessage: 'Hello! I would like to book a stay at Elegancia.',
+    emailIntro: 'Or write, if that is easier',
+    emailLabel: 'Email',
     addressLabel: 'Where we are',
-    bookingLink: 'Check dates and rates on Booking.com',
+    mapLink: 'Skotina, Pieria, Greece',
     responseNote: 'We answer within a day, usually sooner.',
   },
   footer: {
@@ -261,11 +270,14 @@ const el: Dictionary = {
   htmlLang: 'el',
   localeName: 'Ελληνικά',
   switchTo: 'English',
+  switchToShort: 'EN',
   switchToAria: 'Αλλαγή γλώσσας σε Αγγλικά',
+  menuOpen: 'Άνοιγμα μενού',
+  menuClose: 'Κλείσιμο μενού',
+  menuTitle: 'Μενού',
   skipToMain: 'Μετάβαση στο κύριο περιεχόμενο',
   nav: { about: 'Το συγκρότημα', amenities: 'Παροχές', gallery: 'Φωτογραφίες', contact: 'Επικοινωνία', book: 'Κράτηση' },
   opensNewTab: '(ανοίγει σε νέα καρτέλα)',
-  bookOnBooking: 'στο Booking.com',
   metaDescription:
     'Τρεις ιδιωτικές βίλες στην πλαγιά ανάμεσα στον Όλυμπο και το Αιγαίο, η καθεμιά με δική της πισίνα και υδρομασάζ, για έως έξι επισκέπτες. Σκοτίνα, Πιερία.',
   hero: {
@@ -373,16 +385,17 @@ const el: Dictionary = {
     counter: (i, n) => `Φωτογραφία ${i} από ${n}`,
   },
   contact: {
-    eyebrow: 'Επικοινωνία',
-    heading: 'Μιλήστε μαζί μας',
+    eyebrow: 'Απευθείας κράτηση',
+    heading: 'Ένα μήνυμα, μία απάντηση',
     body:
-      'Ημερομηνίες και τιμές θα βρείτε στο Booking.com. Για οτιδήποτε άλλο — μια απορία για το σπίτι, μια αργοπορημένη άφιξη, έξι άτομα και μια κούνια — είναι πιο γρήγορο να ρωτήσετε.',
+      'Κάνετε κράτηση χωρίς ενδιάμεσους — μιλάτε απευθείας με τους ιδιοκτήτες. Ρωτήστε για ημερομηνίες, τιμές, μια αργοπορημένη άφιξη, έξι άτομα και μια κούνια.',
     callLabel: 'Καλέστε μας',
-    whatsappLabel: 'Στείλτε μήνυμα στο WhatsApp',
-    whatsappMessage: 'Γεια σας! Έχω μια ερώτηση για μια διαμονή στην Elegancia.',
-    emailLabel: 'Στείλτε μας email',
+    whatsappLabel: 'Στείλτε μήνυμα',
+    whatsappMessage: 'Γεια σας! Θα ήθελα να κάνω κράτηση στην Elegancia.',
+    emailIntro: 'Ή γράψτε μας, αν σας βολεύει',
+    emailLabel: 'Email',
     addressLabel: 'Πού βρισκόμαστε',
-    bookingLink: 'Δείτε ημερομηνίες και τιμές στο Booking.com',
+    mapLink: 'Σκοτίνα, Πιερία, Ελλάδα',
     responseNote: 'Απαντάμε μέσα σε μία ημέρα, συνήθως νωρίτερα.',
   },
   footer: {

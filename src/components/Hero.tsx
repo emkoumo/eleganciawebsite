@@ -45,7 +45,13 @@ export function Hero({ locale }: { locale: Locale }) {
         fill
         priority
         sizes="100vw"
-        className="-z-10 object-cover"
+        /* The photograph is portrait (1800x2400) and the hero is far wider than
+           it is tall on desktop but narrower on a phone, so `cover` crops a
+           different axis at each end. On a phone it trims ~240px horizontally,
+           and centring that trim cut the swimming pool — the subject — off the
+           right edge. Biasing the crop to 68% keeps the pool in frame. Desktop
+           crops vertically instead, where centre is already right. */
+        className="-z-10 object-cover object-[68%_center] sm:object-center"
       />
 
       {/*

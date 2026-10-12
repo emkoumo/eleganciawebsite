@@ -31,10 +31,13 @@ export function Gallery({ locale }: { locale: Locale }) {
 
   /* 53 photographs in one grid is an enormous scroll, especially on a phone
      where only two fit per row. Showing a first tranche keeps the section
-     skimmable and lets a visitor reach the contact form; the rest is one tap
-     away. The lightbox still receives the FULL filtered set, so arrow-key
+     skimmable and lets a visitor reach the contact details; the rest is one
+     tap away. 16 rather than 12: twelve filled exactly three desktop rows and
+     stopped, which read as the whole set — sixteen leaves the fourth row
+     clearly partial at most widths, so the "show all" control has something to
+     answer. The lightbox still receives the FULL filtered set, so arrow-key
      navigation runs past the visible tranche rather than dead-ending. */
-  const INITIAL = 12
+  const INITIAL = 16
   const visible = expanded ? filtered : filtered.slice(0, INITIAL)
   const hidden = filtered.length - visible.length
 
@@ -49,7 +52,10 @@ export function Gallery({ locale }: { locale: Locale }) {
     <section
       id="gallery"
       aria-labelledby="gallery-heading"
-      className="bg-sand py-24 md:py-32 lg:py-40"
+      /* cream, matching About. The page now alternates cream / sand / cream,
+         so each section boundary is a visible surface change as you scroll
+         rather than two light bands running into one another. */
+      className="bg-cream py-24 md:py-32 lg:py-40"
     >
       <div className="mx-auto max-w-6xl px-6">
         <Reveal className="max-w-2xl">

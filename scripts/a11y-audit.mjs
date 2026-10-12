@@ -561,6 +561,24 @@ async function auditLocale(browser, locale) {
   )
   check(routes.form === 0, 'No enquiry form left in the contact section', `Found ${routes.form} form(s) in #contact — the dead enquiry form is back`)
 
+  /* Direct booking is the whole commercial point: a single surviving
+     Booking.com link sends the best-converting traffic to the commissioned
+     route. Checked across the WHOLE document, not just #contact, because they
+     were previously in the header, the footer and the hero too. */
+  const offsite = await page.evaluate(() => {
+    const hrefs = [...document.querySelectorAll('a[href]')].map((a) => a.getAttribute('href'))
+    return {
+      booking: hrefs.filter((h) => /booking\.com/i.test(h ?? '')),
+      maps: hrefs.find((h) => /maps\.app\.goo\.gl|google\.[a-z.]+\/maps/i.test(h ?? '')),
+    }
+  })
+  check(
+    offsite.booking.length === 0,
+    'No Booking.com links anywhere on the page',
+    `Found ${offsite.booking.length} Booking.com link(s): ${offsite.booking.slice(0, 2).join(', ')}`,
+  )
+  check(!!offsite.maps, `Location links to Google Maps (${offsite.maps})`, 'Location is not linked to Google Maps')
+
   // --- Structure ---------------------------------------------------------
   const structure = await page.evaluate(() => {
     const headings = [...document.querySelectorAll('h1,h2,h3,h4,h5,h6')].map((h) => ({

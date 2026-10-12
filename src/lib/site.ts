@@ -8,8 +8,12 @@ export const site = {
   name: 'Elegancia Luxury Villas',
   /** Canonical origin, used for hreflang alternates and Open Graph. */
   url: 'https://eleganciawebsite.vercel.app',
-  /** Booking.com share link. Works for humans; blocks bots. */
-  bookingUrl: 'https://www.booking.com/Share-p19G51n',
+  /* Every Booking.com link is gone, deliberately. The goal is direct booking,
+     and a page that offers both routes sends its best-converting traffic to the
+     one that charges commission. The header CTA now points at #contact. */
+
+  /** Shared Google Maps pin for the villas. */
+  mapsUrl: 'https://maps.app.goo.gl/UFAk8p8WT2uzAG8z8',
 
   /* Verified from the Greek house-rules PDF. */
   checkIn: '15:00 – 22:00',
