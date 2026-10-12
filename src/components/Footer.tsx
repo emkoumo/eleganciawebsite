@@ -69,7 +69,15 @@ export function Footer({ locale }: { locale: Locale }) {
                   {site.contact.email}
                 </a>
               </li>
-              <li>{site.contact.phone}</li>
+              {/* tel: needs the E.164 form; the grouped form is for reading. */}
+              <li>
+                <a
+                  href={`tel:${site.contact.phone}`}
+                  className="cursor-pointer underline decoration-champagne/40 underline-offset-4 transition-colors duration-200 hover:text-white hover:decoration-white"
+                >
+                  {site.contact.phoneDisplay}
+                </a>
+              </li>
             </ul>
 
             <a

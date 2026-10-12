@@ -8,7 +8,8 @@
    Per locale:
      1. axe-core on the landing page (after scrolling, so reveals have fired)
      2. axe-core with the lightbox open — dialog, focus trap, live caption
-     3. axe-core with the contact form in its error state
+     3. the contact routes — tel:, mailto: and wa.me are now the only ways to
+        reach the owners, and a typo in one is silent
      4. axe-core under prefers-reduced-motion
      5. structural checks axe cannot express: single h1, heading order,
         landmarks, skip link first in tab order, correct <html lang>
@@ -44,27 +45,116 @@ const AXE_SOURCE = readFileSync(
 )
 
 /* --------------------------------------------------------------------------
-   Hero text contrast, sampled from RENDERED PIXELS.
+   Text contrast over a photograph, sampled from RENDERED PIXELS.
 
-   The hero places text over a photograph behind a gradient scrim. No static
-   analysis can evaluate that: axe sees a semi-transparent overlay, WAVE walks
-   past it to the section background, and neither knows what the photo looks
-   like where the words fall.
+   Two bands do this — the hero and the contact section. No static analysis can
+   evaluate either: axe sees a semi-transparent overlay, WAVE walks past it to
+   the section background, and neither knows what the photo looks like where
+   the words fall.
 
-   So this screenshots the hero, then for each text element samples a grid of
-   real pixels inside its bounding box and computes the worst contrast found
-   against that element's own text colour. That makes swapping the hero photo
+   So this screenshots the section, then for each text element samples a grid
+   of real pixels inside its bounding box and computes the worst contrast found
+   against that element's own text colour. That makes swapping either photo
    safe: a darker or busier image fails here loudly instead of silently.
 -------------------------------------------------------------------------- */
-async function checkHeroPixelContrast(page, sharp) {
-  /* Collect the boxes and colours FIRST, while the text is still visible. */
-  const targets = await page.evaluate(() => {
-    const hero = document.querySelector('section')
+async function checkPixelContrast(page, sharp, selector, label) {
+  /* Every text node in the section that a sighted user can see. Collected up
+     front so that anything the sampling passes fail to reach is reported as a
+     gap rather than quietly skipped. */
+  const expected = await page.evaluate((sel) => {
+    const root = document.querySelector(sel)
+    if (!root) return null
+    return [...root.querySelectorAll('h1, h2, p, a')]
+      .filter((el) => {
+        const b = el.getBoundingClientRect()
+        const cs = getComputedStyle(el)
+        return b.width >= 4 && b.height >= 4 && el.textContent?.trim() &&
+          cs.visibility !== 'hidden' && cs.display !== 'none'
+      })
+      .map((el) => el.textContent.trim().slice(0, 34))
+  }, selector)
+
+  if (expected === null) {
+    console.log(`    ✗ ${label} pixels: no element matches ${selector}`)
+    failures++
+    return
+  }
+
+  const measured = new Map()
+
+  /* Two scroll positions, because a section can be taller than the viewport
+     and a screenshot only ever shows one viewport of it. The first puts the
+     section's top edge just below the fixed header, the second puts its bottom
+     edge at the foot of the viewport; between them they cover any section up
+     to roughly twice the viewport height. */
+  for (const align of ['top', 'bottom']) {
+    await scrollSectionIntoFrame(page, selector, align)
+    const found = await samplePixelContrastOnce(page, sharp, selector)
+    for (const [text, m] of found) {
+      const prev = measured.get(text)
+      if (!prev || m.worst < prev.worst) measured.set(text, m)
+    }
+  }
+
+  for (const [text, m] of measured) {
+    const ok = m.worst >= m.need
+    console.log(
+      ok
+        ? `    ✓ ${label} pixels: "${text}" worst ${m.worst.toFixed(2)}:1 vs ${m.hex} (needs ${m.need})`
+        : `    ✗ ${label} pixels: "${text}" worst ${m.worst.toFixed(2)}:1 vs ${m.hex} — needs ${m.need}`,
+    )
+    if (!ok) failures++
+  }
+
+  /* A text that never landed fully inside a sampling frame is unverified, not
+     passing. Say so rather than letting the count look complete. */
+  const missed = [...new Set(expected)].filter((t) => !measured.has(t) && !skipped.has(t))
+  if (missed.length) {
+    console.log(`    ✗ ${label} pixels: ${missed.length} text(s) never sampled: ${missed.slice(0, 4).map((t) => `"${t}"`).join(', ')}`)
+    failures++
+  }
+
+  await page.evaluate(() => window.scrollTo(0, 0))
+  await new Promise((r) => setTimeout(r, 200))
+}
+
+/** Elements deliberately not pixel-sampled (they paint their own opaque bg). */
+const skipped = new Set()
+
+/** Put `selector`'s top edge below the fixed header, or its bottom at the foot. */
+async function scrollSectionIntoFrame(page, selector, align) {
+  await page.evaluate(
+    (sel, al) => {
+      const el = document.querySelector(sel)
+      const header = document.querySelector('header')
+      const headerH = header ? header.getBoundingClientRect().height : 0
+      const top = el.getBoundingClientRect().top + window.scrollY
+      const height = el.getBoundingClientRect().height
+      document.documentElement.style.scrollBehavior = 'auto'
+      const y = al === 'top' ? top - headerH - 8 : top + height - window.innerHeight + 8
+      window.scrollTo(0, Math.max(0, y))
+    },
+    selector,
+    align,
+  )
+  await new Promise((r) => setTimeout(r, 350))
+}
+
+async function samplePixelContrastOnce(page, sharp, selector) {
+  /* Collect the boxes and colours FIRST, while the text is still visible.
+     Only elements lying entirely inside the usable band — below the fixed
+     header, above the fold — are measured here; the other scroll pass picks
+     up the rest. */
+  const targets = await page.evaluate((sel) => {
+    const hero = document.querySelector(sel)
     if (!hero) return []
+    const header = document.querySelector('header')
+    const top = header ? header.getBoundingClientRect().height : 0
     const out = []
-    for (const el of hero.querySelectorAll('h1, p, a')) {
+    for (const el of hero.querySelectorAll('h1, h2, p, a')) {
       const b = el.getBoundingClientRect()
-      if (b.width < 4 || b.height < 4 || b.top > 900) continue
+      if (b.width < 4 || b.height < 4) continue
+      if (b.top < top || b.bottom > window.innerHeight) continue
       if (!el.textContent?.trim()) continue
       const cs = getComputedStyle(el)
       /* Canvas round-trip rather than a regex: Tailwind v4 computes every
@@ -91,20 +181,27 @@ async function checkHeroPixelContrast(page, sharp) {
       })
     }
     return out
-  })
+  }, selector)
 
-  /* Now hide the hero text and screenshot, so every sampled pixel is BACKDROP
-     rather than a glyph. Sampling with the text visible is what produced a
-     nonsensical 1.00:1 — the sample simply landed on the letters. */
-  await page.evaluate(() => {
-    const hero = document.querySelector('section')
-    for (const el of hero.querySelectorAll('h1, p, a')) {
+  /* Now hide the section's text and screenshot, so every sampled pixel is
+     BACKDROP rather than a glyph. Sampling with the text visible is what
+     produced a nonsensical 1.00:1 — the sample simply landed on the letters. */
+  await page.evaluate((sel) => {
+    const hero = document.querySelector(sel)
+    for (const el of hero.querySelectorAll('h1, h2, p, a')) {
       el.setAttribute('data-hidden-for-sampling', '')
       el.style.visibility = 'hidden'
     }
-  })
+  }, selector)
   await new Promise((r) => setTimeout(r, 120))
-  const shot = await page.screenshot({ clip: { x: 0, y: 0, width: 1440, height: 900 } })
+  /* No `clip`. Puppeteer's clip is in PAGE coordinates while
+     getBoundingClientRect() is viewport-relative, so clipping to {0,0,…} once
+     the page is scrolled silently samples the top of the document instead of
+     the section under test — which is how the contact band first "passed"
+     while actually being measured against the hero's pixels. An unclipped
+     screenshot is the viewport, which is the coordinate space the boxes are
+     already in. */
+  const shot = await page.screenshot()
   await page.evaluate(() => {
     for (const el of document.querySelectorAll('[data-hidden-for-sampling]')) {
       el.style.visibility = ''
@@ -119,16 +216,18 @@ async function checkHeroPixelContrast(page, sharp) {
   const lum = (r, g, b) => 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b)
   const cr = (a, b) => (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05)
 
-  const seen = new Set()
+  const out = new Map()
   for (const t of targets) {
-    if (seen.has(t.text)) continue
-    seen.add(t.text)
+    if (out.has(t.text)) continue
 
-    /* Skip elements painting their own opaque background — the CTA button is
-       sand-on-espresso by construction and already covered by the
-       opaque-ancestor probe. */
+    /* Skip elements painting their own opaque background — the hero CTA and
+       the WhatsApp button are sand-on-espresso by construction and already
+       covered by the opaque-ancestor probe. */
     const bgAlpha = t.ownBg.match(/rgba?\([^)]*?,\s*([\d.]+)\)$/)
-    if (t.ownBg !== 'rgba(0, 0, 0, 0)' && (!bgAlpha || Number(bgAlpha[1]) > 0.99)) continue
+    if (t.ownBg !== 'rgba(0, 0, 0, 0)' && (!bgAlpha || Number(bgAlpha[1]) > 0.99)) {
+      skipped.add(t.text)
+      continue
+    }
 
     const need = t.size >= 24 || (t.size >= 18.66 && t.weight >= 700) ? 3 : 4.5
     const a = t.fgAlpha ?? 1
@@ -147,19 +246,10 @@ async function checkHeroPixelContrast(page, sharp) {
         if (ratio < worst) { worst = ratio; worstPx = bg }
       }
     }
-    const ok = worst >= need
     const hex = worstPx ? '#' + worstPx.map((v) => v.toString(16).padStart(2, '0')).join('') : '?'
-    console.log(
-      ok
-        ? `    \u2713 Hero pixels: "${t.text}" worst ${worst.toFixed(2)}:1 vs ${hex} (needs ${need})`
-        : `    \u2717 Hero pixels: "${t.text}" worst ${worst.toFixed(2)}:1 vs ${hex} — needs ${need}`,
-    )
-    if (!ok) failures++
+    out.set(t.text, { worst, hex, need })
   }
-  if (seen.size === 0) {
-    console.log('    \u2717 Hero pixels: found no hero text to sample')
-    failures++
-  }
+  return out
 }
 
 let failures = 0
@@ -357,7 +447,10 @@ async function auditLocale(browser, locale) {
 
   /* <html lang> must match the content, or a screen reader mispronounces every
      word on the Greek page. */
-  await checkHeroPixelContrast(page, sharp)
+  /* Both bands set light text over a photograph, which no static analysis can
+     evaluate — so both get sampled from real rendered pixels. */
+  await checkPixelContrast(page, sharp, '#contact', 'Contact')
+  await checkPixelContrast(page, sharp, 'section', 'Hero')
 
   const lang = await page.evaluate(() => document.documentElement.lang)
   check(lang === locale.lang, `<html lang="${lang}">`, `<html lang="${lang}"> — expected "${locale.lang}"`)
@@ -413,13 +506,34 @@ async function auditLocale(browser, locale) {
     check((await page.$('[role="dialog"]')) === null, 'Escape closes the lightbox', 'Escape did NOT close the lightbox')
   }
 
-  // --- Contact form error state ------------------------------------------
-  await page.evaluate(() => document.getElementById('contact')?.scrollIntoView())
-  await page.click('#contact form button[type="submit"]')
-  await new Promise((r) => setTimeout(r, 300))
-  const invalid = await page.$$eval('#contact form [aria-invalid="true"]', (e) => e.length)
-  check(invalid > 0, `Form marked ${invalid} field(s) aria-invalid`, 'Form did not set aria-invalid')
-  report('Contact form, error state', await runAxe(page))
+  // --- Contact routes ----------------------------------------------------
+  /* The enquiry form was removed because /api/enquiry never sent mail, so the
+     three remaining routes are now the ONLY way to reach the owners. A typo in
+     any of them is silent — the link still looks fine and simply goes nowhere.
+     tel: and wa.me both need E.164 digits with no spaces or punctuation, which
+     is exactly the kind of thing a well-meaning edit to the display string
+     breaks. */
+  const routes = await page.evaluate(() => {
+    const hrefs = [...document.querySelectorAll('#contact a')].map((a) => a.getAttribute('href'))
+    return {
+      tel: hrefs.find((h) => h?.startsWith('tel:')),
+      mail: hrefs.find((h) => h?.startsWith('mailto:')),
+      wa: hrefs.find((h) => h?.includes('wa.me')),
+      form: document.querySelectorAll('#contact form').length,
+    }
+  })
+  check(routes.tel === 'tel:+306931145507', `Phone link ${routes.tel}`, `Phone link is "${routes.tel}" — expected tel:+306931145507`)
+  check(
+    routes.mail === 'mailto:info@elegancialuxuryvillas.com',
+    `Email link ${routes.mail}`,
+    `Email link is "${routes.mail}" — expected mailto:info@elegancialuxuryvillas.com`,
+  )
+  check(
+    !!routes.wa?.startsWith('https://wa.me/306931145507?text='),
+    'WhatsApp link points at wa.me/306931145507 with a prefilled message',
+    `WhatsApp link is "${routes.wa}"`,
+  )
+  check(routes.form === 0, 'No enquiry form left in the contact section', `Found ${routes.form} form(s) in #contact — the dead enquiry form is back`)
 
   // --- Structure ---------------------------------------------------------
   const structure = await page.evaluate(() => {

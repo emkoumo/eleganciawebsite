@@ -15,10 +15,14 @@ export const site = {
   checkIn: '15:00 – 22:00',
   checkOut: '11:00',
 
-  /* TODO: replace with the real published contact details before launch. */
   contact: {
-    email: 'TODO@eleganciavillas.gr',
-    phone: 'TODO +30 XXX XXX XXXX',
+    email: 'info@elegancialuxuryvillas.com',
+    /** E.164, no spaces — what tel: and wa.me both need. */
+    phone: '+306931145507',
+    /** Grouped for reading. Never put this in an href. */
+    phoneDisplay: '+30 693 114 5507',
+    /** wa.me wants the number without the leading +. */
+    whatsapp: '306931145507',
   },
 
   /** Per-villa logo marks. The villas are identical, so these are branding

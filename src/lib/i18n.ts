@@ -76,33 +76,21 @@ export type Dictionary = {
     next: string
     counter: (i: number, n: number) => string
   }
+  /* The enquiry form is gone. It posted to /api/enquiry, which validated and
+     logged but never actually sent mail — so every enquiry made through it was
+     silently dropped. Three real routes that work beat one that does not. */
   contact: {
     eyebrow: string
     heading: string
     body: string
+    callLabel: string
+    whatsappLabel: string
+    /** Prefilled into the WhatsApp composer, so the guest starts mid-sentence. */
+    whatsappMessage: string
     emailLabel: string
-    phoneLabel: string
     addressLabel: string
     bookingLink: string
-    form: {
-      name: string
-      email: string
-      emailHint: string
-      villa: string
-      villaAny: string
-      arrival: string
-      departure: string
-      message: string
-      submit: string
-      submitting: string
-      required: string
-      errName: string
-      errEmailEmpty: string
-      errEmailInvalid: string
-      errMessage: string
-      success: string
-      failure: string
-    }
+    responseNote: string
   }
   footer: { stay: string; checkIn: string; checkOut: string; contact: string; rights: string }
   stayPolicy: string[]
@@ -134,23 +122,31 @@ const en: Dictionary = {
     ],
     cta: 'Check availability',
   },
+  /* This section used to restate the hero almost word for word — three villas,
+     three pools, no reception — which is why it read as empty despite a tall
+     band. The hero already sells what the place IS; About now does the job
+     nothing else on the page does, which is the setting and the shape of a day
+     in it. No counts, no amenities: Highlights and Amenities own those. */
   about: {
-    eyebrow: 'The complex',
-    heading: 'Quiet, by design',
+    eyebrow: 'The setting',
+    heading: 'Between the mountain and the sea',
     paragraphs: [
-      'Three houses on the slope between Olympus and the sea. Three pools. No lobby, no reception desk.',
-      'Each villa sleeps six. Two master bedrooms, two bathrooms, a kitchen you can properly cook in. You let yourself in.',
-      'The coast is fifteen minutes down the hill.',
+      'Skotina sits on the eastern slope of Olympus, with the Thermaic Gulf laid out below and the mountain still climbing behind.',
+      'Mornings belong to the pool, before the heat arrives. By late afternoon the light comes in low across the terrace and the hills turn the colour of the stone the houses are built from.',
+      'The sea is fifteen minutes down the hill; the first Olympus trailheads about as far back up it. Most people manage both in a day and still cook dinner at home.',
     ],
   },
+  /* Captions were two or three words each ("Matte. Unlacquered.") — too clipped
+     to tell a guest anything. Each one now gives the material and the reason it
+     was chosen, which is the whole argument of the section. */
   materials: {
     eyebrow: 'Made of',
     heading: 'Four materials, nothing more',
     items: [
-      { name: 'Natural stone', note: 'Quarried in Pieria.', photo: 'living-stone-wall.jpg' },
-      { name: 'Pale oak', note: 'Matte. Unlacquered.', photo: 'kitchen-shelf.jpg' },
-      { name: 'Microcement', note: 'Seamless. Cool underfoot.', photo: 'bathroom-tap-detail.jpg' },
-      { name: 'Linen', note: 'Washed. Heavy. Slow to crease.', photo: 'bedroom-cushion-detail.jpg' },
+      { name: 'Natural stone', note: 'Quarried in Pieria, left rough where it meets the living room.', photo: 'living-stone-wall.jpg' },
+      { name: 'Pale oak', note: 'Unlacquered, so it warms and darkens a little with use instead of staying new.', photo: 'kitchen-shelf.jpg' },
+      { name: 'Microcement', note: 'Poured in one piece through the bathrooms. No grout lines, and cool underfoot in August.', photo: 'bathroom-tap-detail.jpg' },
+      { name: 'Linen', note: 'Washed before it ever reaches the bed, which is why it feels soft and falls heavy.', photo: 'bedroom-cushion-detail.jpg' },
     ],
   },
   villas: { names: ['Villa 1', 'Villa 2', 'Villa 3'] },
@@ -208,33 +204,17 @@ const en: Dictionary = {
     counter: (i, n) => `Photograph ${i} of ${n}`,
   },
   contact: {
-    eyebrow: 'Enquiries',
-    heading: 'Ask us',
+    eyebrow: 'Contact',
+    heading: 'Talk to us directly',
     body:
-      'Availability and rates are on Booking.com. For anything else, write to us.',
-    emailLabel: 'Email',
-    phoneLabel: 'Telephone',
-    addressLabel: 'Address',
+      'Dates and rates live on Booking.com. For everything else — a question about the house, a late ferry, six of you and a cot — it is quicker to just ask.',
+    callLabel: 'Call us',
+    whatsappLabel: 'Message on WhatsApp',
+    whatsappMessage: 'Hello! I have a question about staying at Elegancia.',
+    emailLabel: 'Email us',
+    addressLabel: 'Where we are',
     bookingLink: 'Check dates and rates on Booking.com',
-    form: {
-      name: 'Your name',
-      email: 'Email address',
-      emailHint: 'We reply within 24 hours.',
-      villa: 'Which villa interests you?',
-      villaAny: 'No preference',
-      arrival: 'Arrival',
-      departure: 'Departure',
-      message: 'Your message',
-      submit: 'Send enquiry',
-      submitting: 'Sending…',
-      required: '(required)',
-      errName: 'Please enter your name.',
-      errEmailEmpty: 'Please enter your email address.',
-      errEmailInvalid: 'Enter a valid email address, for example name@example.com.',
-      errMessage: 'Please tell us a little about your stay.',
-      success: 'Thank you — your enquiry has been sent. We will reply within 24 hours.',
-      failure: 'Something went wrong sending your enquiry. Please email us directly instead.',
-    },
+    responseNote: 'We answer within a day, usually sooner.',
   },
   footer: {
     stay: 'Stay',
@@ -279,22 +259,22 @@ const el: Dictionary = {
     cta: 'Δείτε διαθεσιμότητα',
   },
   about: {
-    eyebrow: 'Το συγκρότημα',
-    heading: 'Ήσυχα, από επιλογή',
+    eyebrow: 'Η τοποθεσία',
+    heading: 'Ανάμεσα στο βουνό και τη θάλασσα',
     paragraphs: [
-      'Τρία σπίτια στην πλαγιά, ανάμεσα στον Όλυμπο και τη θάλασσα. Τρεις πισίνες. Χωρίς υποδοχή.',
-      'Κάθε βίλα φιλοξενεί έξι. Δύο master υπνοδωμάτια, δύο μπάνια, κουζίνα για πραγματικό μαγείρεμα. Μπαίνετε μόνοι σας.',
-      'Η παραλία είναι δεκαπέντε λεπτά πιο κάτω.',
+      'Η Σκοτίνα βρίσκεται στην ανατολική πλαγιά του Ολύμπου, με τον Θερμαϊκό απλωμένο από κάτω και το βουνό να συνεχίζει να ανηφορίζει από πίσω.',
+      'Τα πρωινά ανήκουν στην πισίνα, πριν ανέβει η ζέστη. Αργά το απόγευμα το φως πέφτει πλάγια στη βεράντα και οι λόφοι παίρνουν το χρώμα της πέτρας από την οποία είναι χτισμένα τα σπίτια.',
+      'Η θάλασσα είναι δεκαπέντε λεπτά πιο κάτω· τα πρώτα μονοπάτια του Ολύμπου περίπου άλλα τόσα πιο πάνω. Οι περισσότεροι προλαβαίνουν και τα δύο μέσα στην ημέρα, και μαγειρεύουν κιόλας το βράδυ.',
     ],
   },
   materials: {
     eyebrow: 'Υλικά',
     heading: 'Τέσσερα υλικά, τίποτα άλλο',
     items: [
-      { name: 'Φυσική πέτρα', note: 'Από την Πιερία.', photo: 'living-stone-wall.jpg' },
-      { name: 'Ανοιχτή δρυς', note: 'Ματ. Χωρίς βερνίκι.', photo: 'kitchen-shelf.jpg' },
-      { name: 'Microcement', note: 'Χωρίς αρμούς. Δροσερό.', photo: 'bathroom-tap-detail.jpg' },
-      { name: 'Λινό', note: 'Πλυμένο. Βαρύ. Δεν τσαλακώνει.', photo: 'bedroom-cushion-detail.jpg' },
+      { name: 'Φυσική πέτρα', note: 'Από λατομεία της Πιερίας, αφημένη αδρή εκεί που συναντά το σαλόνι.', photo: 'living-stone-wall.jpg' },
+      { name: 'Ανοιχτή δρυς', note: 'Χωρίς βερνίκι, ώστε να ζεσταίνει και να σκουραίνει λίγο με τη χρήση αντί να μένει καινούργια.', photo: 'kitchen-shelf.jpg' },
+      { name: 'Μικροτσιμέντο', note: 'Χυτό σε ένα κομμάτι σε όλα τα μπάνια. Χωρίς αρμούς, και δροσερό τον Αύγουστο.', photo: 'bathroom-tap-detail.jpg' },
+      { name: 'Λινό', note: 'Πλυμένο πριν φτάσει καν στο κρεβάτι — γι’ αυτό είναι μαλακό και πέφτει βαρύ.', photo: 'bedroom-cushion-detail.jpg' },
     ],
   },
   villas: { names: ['Βίλα 1', 'Βίλα 2', 'Βίλα 3'] },
@@ -353,32 +333,16 @@ const el: Dictionary = {
   },
   contact: {
     eyebrow: 'Επικοινωνία',
-    heading: 'Ρωτήστε μας',
+    heading: 'Μιλήστε μαζί μας',
     body:
-      'Διαθεσιμότητα και τιμές στο Booking.com. Για οτιδήποτε άλλο, γράψτε μας.',
-    emailLabel: 'Email',
-    phoneLabel: 'Τηλέφωνο',
-    addressLabel: 'Διεύθυνση',
+      'Ημερομηνίες και τιμές θα βρείτε στο Booking.com. Για οτιδήποτε άλλο — μια απορία για το σπίτι, μια αργοπορημένη άφιξη, έξι άτομα και μια κούνια — είναι πιο γρήγορο να ρωτήσετε.',
+    callLabel: 'Καλέστε μας',
+    whatsappLabel: 'Στείλτε μήνυμα στο WhatsApp',
+    whatsappMessage: 'Γεια σας! Έχω μια ερώτηση για μια διαμονή στην Elegancia.',
+    emailLabel: 'Στείλτε μας email',
+    addressLabel: 'Πού βρισκόμαστε',
     bookingLink: 'Δείτε ημερομηνίες και τιμές στο Booking.com',
-    form: {
-      name: 'Το όνομά σας',
-      email: 'Διεύθυνση email',
-      emailHint: 'Απαντάμε εντός 24 ωρών.',
-      villa: 'Ποια βίλα σας ενδιαφέρει;',
-      villaAny: 'Καμία προτίμηση',
-      arrival: 'Άφιξη',
-      departure: 'Αναχώρηση',
-      message: 'Το μήνυμά σας',
-      submit: 'Αποστολή',
-      submitting: 'Αποστολή…',
-      required: '(υποχρεωτικό)',
-      errName: 'Συμπληρώστε το όνομά σας.',
-      errEmailEmpty: 'Συμπληρώστε τη διεύθυνση email σας.',
-      errEmailInvalid: 'Εισάγετε έγκυρη διεύθυνση email, για παράδειγμα name@example.com.',
-      errMessage: 'Πείτε μας λίγα λόγια για τη διαμονή σας.',
-      success: 'Σας ευχαριστούμε — το μήνυμά σας στάλθηκε. Θα απαντήσουμε εντός 24 ωρών.',
-      failure: 'Κάτι πήγε στραβά με την αποστολή. Στείλτε μας email απευθείας.',
-    },
+    responseNote: 'Απαντάμε μέσα σε μία ημέρα, συνήθως νωρίτερα.',
   },
   footer: {
     stay: 'Διαμονή',
