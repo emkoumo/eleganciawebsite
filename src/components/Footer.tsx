@@ -63,11 +63,6 @@ export function Footer({ locale }: { locale: Locale }) {
                 <dd>{site.checkOut}</dd>
               </div>
             </dl>
-            <ul className="mt-5 space-y-1.5 text-sm text-sand/90">
-              {d.stayPolicy.map((note) => (
-                <li key={note}>{note}</li>
-              ))}
-            </ul>
           </div>
 
           <div className="md:col-span-4">

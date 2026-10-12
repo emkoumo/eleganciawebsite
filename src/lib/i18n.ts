@@ -109,7 +109,6 @@ export type Dictionary = {
     /** Per-locale PDF. Drop the files in public/documents/. */
     houseRulesPdf: string
   }
-  stayPolicy: string[]
   /* EU / ESPA co-funding banner. The artwork itself is localised — the
      publicity rules require the acknowledgement in the language the visitor is
      reading — so the file path is part of the dictionary, not a constant.
@@ -264,12 +263,6 @@ const en: Dictionary = {
     houseRules: 'House rules (PDF)',
     houseRulesPdf: '/documents/house-rules-en.pdf',
   },
-  stayPolicy: [
-    'No smoking indoors',
-    'No parties or events without prior approval',
-    'Pets only by prior arrangement',
-    'Children must be supervised at the pool at all times',
-  ],
   espa: {
     src: '/images/espa/antagonistikotita-en.jpg',
     /* Kept under 100 characters: WAVE raises a "long alternative text" alert
@@ -420,12 +413,6 @@ const el: Dictionary = {
     houseRules: 'Κανονισμός διαμονής (PDF)',
     houseRulesPdf: '/documents/house-rules-el.pdf',
   },
-  stayPolicy: [
-    'Απαγορεύεται το κάπνισμα στους εσωτερικούς χώρους',
-    'Δεν επιτρέπονται πάρτι ή εκδηλώσεις χωρίς έγκριση',
-    'Κατοικίδια μόνο κατόπιν συμφωνίας',
-    'Τα παιδιά πρέπει να επιβλέπονται συνεχώς στην πισίνα',
-  ],
   espa: {
     src: '/images/espa/antagonistikotita-el.jpg',
     alt: 'Με τη συγχρηματοδότηση της Ευρωπαϊκής Ένωσης — ΕΣΠΑ 2021-2027, Πρόγραμμα Ανταγωνιστικότητα',
