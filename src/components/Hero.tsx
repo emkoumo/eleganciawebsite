@@ -49,64 +49,23 @@ export function Hero({ locale }: { locale: Locale }) {
       />
 
       {/*
-        Contrast scrim — weighted to the BOTTOM, where the text sits.
+        Global wash — deliberately light.
 
-        A flat 85–95% wash across the whole image did meet AA, but it buried the
-        photograph: at that opacity the villa was barely visible, which defeats
-        having a hero image at all. The scrim only needs to be heavy where text
-        overlaps it.
+        This used to be two heavy full-frame scrims: a vertical one running to
+        0.82 at the bottom and a horizontal one adding another 0.70 on the left,
+        compositing to 0.95 behind the text. They met AA comfortably and buried
+        the photograph doing it, because a veil that covers everything has to be
+        heavy enough for the brightest thing it covers.
 
-        This became possible once the header was made opaque. Previously the
-        header was transparent and relied on this scrim for its own contrast, so
-        the top had to stay dark too. The header now supplies its own background,
-        which frees the top of the image to be seen.
-
-        Stops are measured, not eyeballed. The gradient holds a heavy alpha up to
-        the highest point any text reaches, then lightens sharply above it:
-
-            0%  (bottom) 0.82
-           45%           0.78
-           74%           0.68    -> highest point text reaches, in Greek
-           90%           0.30    -> no text here
-          100% (top)     0.08    -> photograph essentially unveiled
-
-        The 74% stop is set by the GREEK copy, not the English: Greek runs longer,
-        so its heading wraps to an extra line and pushes the whole block upward
-        into lighter gradient. Tuned to the longer locale, verified on both.
-
-        scripts/a11y-audit.mjs verifies this by sampling the ACTUAL rendered
-        pixels behind each text element rather than trusting these numbers, so
-        changing the hero photo cannot silently break contrast.
-
-        Champagne is still unsafe for small text anywhere over this scrim, so the
-        eyebrow below is overridden to sand.
-
-        `scrim-relief` masks this gradient's own alpha down over the right third
-        from lg up, where there is no text to protect — see globals.css. Below
-        lg it does nothing, because at phone width the text IS the right third.
+        All the contrast work now happens in the pool below, which only covers
+        the words. What is left here is cohesion, not contrast: just enough to
+        seat the photograph in the page and keep the bottom edge from competing
+        with the section beneath it. Nothing on this layer is load-bearing for
+        accessibility, which is why it can be this transparent.
       */}
       <div
         aria-hidden="true"
-        className="scrim-relief absolute inset-0 -z-10 bg-[linear-gradient(to_top,rgba(31,27,23,0.82)_0%,rgba(31,27,23,0.78)_45%,rgba(31,27,23,0.68)_74%,rgba(31,27,23,0.30)_90%,rgba(31,27,23,0.08)_100%)]"
-      />
-
-      {/*
-        Second, LOCALISED wash behind the text column.
-
-        Lightening the vertical scrim dropped the 12px eyebrow to 3.76:1 against
-        a bright window in the photograph — measured, not guessed. Re-darkening
-        the whole image would have undone the point of lightening it, so instead
-        this darkens only the left third, where all the text sits. The pool and
-        architecture on the right stay bright.
-
-        Alphas compose, so this lifts the text column without touching the rest:
-        where the vertical scrim is 0.68, adding 0.70 here yields an effective
-        1-(1-0.68)(1-0.70) = 0.90 exactly where it is needed. Every figure is
-        confirmed by the pixel sampler in scripts/a11y-audit.mjs.
-      */}
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 -z-10 bg-[linear-gradient(to_right,rgba(31,27,23,0.70)_0%,rgba(31,27,23,0.55)_38%,rgba(31,27,23,0)_72%)]"
+        className="absolute inset-0 -z-10 bg-[linear-gradient(to_top,rgba(31,27,23,0.34)_0%,rgba(31,27,23,0.20)_45%,rgba(31,27,23,0.10)_75%,rgba(31,27,23,0.04)_100%)]"
       />
 
       <motion.div
@@ -120,6 +79,27 @@ export function Hero({ locale }: { locale: Locale }) {
         initial="hidden"
         animate="visible"
       >
+        {/*
+          `isolate` so the pool's -z-10 lands behind this text but still above
+          the photograph and the wash, both of which sit outside this element.
+
+          max-w-3xl matches the widest thing inside (the h1), so the pool's
+          percentages are measured against the text's own box rather than the
+          viewport. That is what lets a single set of stops hold on a 360px
+          phone and a 1440px desktop, where the text is 90% and 53% of the
+          width respectively.
+
+          Variants still reach the children through this plain div: Motion
+          propagates them down the React tree by context, not by DOM parentage.
+        */}
+        <div className="relative isolate max-w-3xl">
+          <div
+            aria-hidden="true"
+            /* Flat fill, soft mask. Extends past the text on every side so the
+               falloff happens outside the glyphs rather than across them. */
+            className="hero-pool pointer-events-none absolute -inset-[50%] -z-10 bg-[rgba(31,27,23,0.93)]"
+          />
+
         <motion.p data-reveal variants={item} className="eyebrow !text-sand">
           {d.hero.location}
         </motion.p>
@@ -194,6 +174,7 @@ export function Hero({ locale }: { locale: Locale }) {
             <span className="sr-only"> WhatsApp {d.opensNewTab}</span>
           </a>
         </motion.div>
+        </div>
       </motion.div>
     </section>
   )
