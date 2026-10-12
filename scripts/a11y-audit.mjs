@@ -30,8 +30,8 @@ const BASE_URL = `http://127.0.0.1:${PORT}`
 const TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa']
 
 const LOCALES = [
-  { path: '/', label: 'en', lang: 'en' },
-  { path: '/el', label: 'el', lang: 'el' },
+  { path: '/', label: 'en', lang: 'en', espa: 'antagonistikotita-en' },
+  { path: '/el', label: 'el', lang: 'el', espa: 'antagonistikotita-el' },
 ]
 
 /* axe-core is injected by hand rather than via @axe-core/puppeteer: that
@@ -361,6 +361,37 @@ async function auditLocale(browser, locale) {
 
   const lang = await page.evaluate(() => document.documentElement.lang)
   check(lang === locale.lang, `<html lang="${lang}">`, `<html lang="${lang}"> — expected "${locale.lang}"`)
+
+  // --- ESPA / EU co-funding banner ---------------------------------------
+  /* Three things axe cannot know:
+       1. the banner is actually on the page at all,
+       2. the LOCALISED artwork matches the page (the EU publicity rules want
+          the acknowledgement in the visitor's language, and a copy-paste of
+          the EN file onto /el is the obvious way to get this wrong),
+       3. the alt is both non-empty and short enough that WAVE does not raise
+          its "long alternative text" alert at ~100 characters.
+     axe is happy with alt="" on any image, so without this the banner could
+     go silently decorative and still pass every other check here. */
+  const espa = await page.evaluate(() => {
+    const img = [...document.querySelectorAll('header img')].find((i) =>
+      /antagonistikotita/.test(i.currentSrc || i.src),
+    )
+    if (!img) return null
+    const b = img.getBoundingClientRect()
+    return {
+      src: decodeURIComponent(img.currentSrc || img.src),
+      alt: img.getAttribute('alt') ?? '',
+      visible: b.width > 1 && b.height > 1,
+    }
+  })
+  if (!espa) {
+    check(false, '', 'ESPA banner not found inside the <header> landmark')
+  } else {
+    check(espa.src.includes(locale.espa), `ESPA banner is the "${locale.label}" artwork`, `ESPA banner is "${espa.src}" — expected ${locale.espa}`)
+    check(espa.visible, 'ESPA banner is rendered and visible', 'ESPA banner is present but not visible')
+    check(espa.alt.trim().length > 0, `ESPA alt text present (${espa.alt.length} chars)`, 'ESPA banner has empty alt — the acknowledgement is lost to screen readers')
+    check(espa.alt.length <= 100, 'ESPA alt text under the 100-char WAVE alert threshold', `ESPA alt text is ${espa.alt.length} chars — WAVE flags "long alternative text" past ~100`)
+  }
 
   // --- Lightbox ----------------------------------------------------------
   const thumb = await page.$('#gallery ul button')

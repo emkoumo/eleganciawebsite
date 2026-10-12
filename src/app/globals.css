@@ -48,8 +48,11 @@
 @layer base {
   html {
     scroll-behavior: smooth;
-    /* Offset anchor targets so the fixed header never covers a heading. */
-    scroll-padding-top: 5.5rem;
+    /* Offset anchor targets so the fixed header never covers a heading.
+       Must clear the WHOLE fixed stack, which is the ESPA strip plus the nav
+       row: ~147px at desktop widths, ~131px on a phone. 10rem = 160px leaves a
+       little air above the heading at the taller of the two. */
+    scroll-padding-top: 10rem;
     -webkit-text-size-adjust: 100%;
   }
 

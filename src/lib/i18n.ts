@@ -106,6 +106,12 @@ export type Dictionary = {
   }
   footer: { stay: string; checkIn: string; checkOut: string; contact: string; rights: string }
   stayPolicy: string[]
+  /* EU / ESPA co-funding banner. The artwork itself is localised — the
+     publicity rules require the acknowledgement in the language the visitor is
+     reading — so the file path is part of the dictionary, not a constant.
+     `alt` carries the full acknowledgement because the banner is the
+     acknowledgement: an empty alt would hide the one thing it exists to say. */
+  espa: { src: string; alt: string }
 }
 
 const en: Dictionary = {
@@ -243,6 +249,13 @@ const en: Dictionary = {
     'Pets only by prior arrangement',
     'Children must be supervised at the pool at all times',
   ],
+  espa: {
+    src: '/images/espa/antagonistikotita-en.jpg',
+    /* Kept under 100 characters: WAVE raises a "long alternative text" alert
+       past roughly that length, and the three facts that matter — EU
+       co-funding, ESPA 2021-2027, Competitiveness programme — fit inside it. */
+    alt: 'Co-funded by the European Union — ESPA 2021-2027, Competitiveness Programme',
+  },
 }
 
 const el: Dictionary = {
@@ -380,6 +393,10 @@ const el: Dictionary = {
     'Κατοικίδια μόνο κατόπιν συμφωνίας',
     'Τα παιδιά πρέπει να επιβλέπονται συνεχώς στην πισίνα',
   ],
+  espa: {
+    src: '/images/espa/antagonistikotita-el.jpg',
+    alt: 'Με τη συγχρηματοδότηση της Ευρωπαϊκής Ένωσης — ΕΣΠΑ 2021-2027, Πρόγραμμα Ανταγωνιστικότητα',
+  },
 }
 
 export const dictionaries: Record<Locale, Dictionary> = { en, el }

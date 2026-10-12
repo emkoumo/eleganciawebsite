@@ -92,7 +92,11 @@ export function Hero({ locale }: { locale: Locale }) {
 
       <motion.div
         data-reveal
-        className="mx-auto w-full max-w-6xl px-6 pb-20 pt-32 sm:pb-28"
+        /* pt clears the fixed stack (ESPA strip + nav row, ~147px). The block
+           is bottom-aligned, so this only bites when the copy is tall enough
+           to overflow — on a short phone in Greek — but that is exactly the
+           case where text would otherwise slide under the header. */
+        className="mx-auto w-full max-w-6xl px-6 pb-20 pt-40 sm:pb-28"
         variants={group}
         initial="hidden"
         animate="visible"

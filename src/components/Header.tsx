@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import { site } from '@/lib/site'
+import { EspaBanner } from '@/components/EspaBanner'
 import { getDictionary, localePath, type Locale } from '@/lib/i18n'
 
 export function Header({ locale }: { locale: Locale }) {
@@ -58,6 +59,13 @@ export function Header({ locale }: { locale: Locale }) {
      sand 12.97:1, champagne 5.62:1, white 12.63:1. */
   return (
     <header className="on-dark fixed inset-x-0 top-0 z-40 border-b border-champagne/15 bg-espresso">
+      {/* EU/ESPA acknowledgement sits above the nav, inside the banner
+          landmark. It stays with the fixed header rather than scrolling away:
+          a static strip would need the header to become sticky, which pushes
+          the hero down out of the viewport and invalidates the measured
+          gradient scrim it relies on for text contrast. */}
+      <EspaBanner locale={locale} />
+
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-6 py-4">
         <a
           href={home}

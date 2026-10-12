@@ -28,3 +28,6 @@ __pycache__/
 
 # claude local overrides
 .claude/settings.local.json
+
+# typescript incremental build info
+tsconfig.tsbuildinfo
