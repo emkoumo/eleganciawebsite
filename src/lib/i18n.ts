@@ -129,7 +129,7 @@ const en: Dictionary = {
      Highlights and Amenities. */
   about: {
     eyebrow: 'The philosophy',
-    heading: 'Built around what matters',
+    heading: 'Nothing more than you need',
     paragraphs: [
       'Elegancia is three private villas, each with its own space and its own quiet. Simplicity here is a choice: clean lines, stone, light, and nothing unnecessary between you and the view.',
       'The pool and the veranda are the centre of the day. That is where the first coffee happens, where the afternoon drifts by, and where the evening ends, once the heat has gone and the hills darken.',
@@ -260,7 +260,7 @@ const el: Dictionary = {
   },
   about: {
     eyebrow: 'Η φιλοσοφία',
-    heading: 'Χτισμένες γύρω από ό,τι μετράει',
+    heading: 'Τίποτα περισσότερο απ’ ό,τι χρειάζεται',
     paragraphs: [
       'Το Elegancia είναι τρεις ιδιωτικές βίλες, η καθεμιά με τον δικό της χώρο και τη δική της ησυχία. Η απλότητα εδώ είναι επιλογή: καθαρές γραμμές, πέτρα, φως και τίποτα περιττό ανάμεσα σε εσάς και στη θέα.',
       'Η πισίνα και η βεράντα είναι το κέντρο της μέρας. Εκεί πίνεις τον πρώτο καφέ, εκεί κυλάει το απόγευμα, και εκεί καταλήγει το βράδυ, όταν η ζέστη έχει φύγει και ο λόφος σκουραίνει.',
