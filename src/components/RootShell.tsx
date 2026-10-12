@@ -34,18 +34,16 @@ export function RootShell({
 
   return (
     <html lang={d.htmlLang} className={geologica.variable}>
-      <head>
-        {/*
-          No-JS safety net. Motion serialises initial="hidden" into the
-          server-rendered HTML, so every scroll-reveal ships with an inline
-          opacity: 0. With JS disabled that never clears and the whole page
-          below the hero stays invisible. A stylesheet !important outranks a
-          non-important inline style, which is what makes this work.
-        */}
-        <noscript>
-          <style>{`[data-reveal]{opacity:1!important;transform:none!important;}`}</style>
-        </noscript>
-      </head>
+      {/*
+        There used to be a <noscript> stylesheet here forcing [data-reveal]
+        elements back to opacity 1, because Motion serialised initial="hidden"
+        into the HTML and with JS disabled that never cleared.
+
+        It is gone because the thing it was rescuing is gone: reveals no longer
+        touch opacity at all, and their resting state is the visible one, so the
+        server HTML is already correct with or without JavaScript. Keeping the
+        override would have been dead code that WAVE flags as an alert.
+      */}
       <body>
         {/* Skip link — the first focusable element on the page. */}
         <a

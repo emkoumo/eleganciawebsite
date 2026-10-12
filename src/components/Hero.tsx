@@ -3,16 +3,21 @@
 import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { site } from '@/lib/site'
-import { useHeroVariants, useStaggerVariants } from '@/lib/motion'
+import { useHeroVariants, useRevealGate, useStaggerVariants } from '@/lib/motion'
 import { getDictionary, type Locale } from '@/lib/i18n'
 import { heroPhoto, photoSrc } from '@/lib/photos'
 
 export function Hero({ locale }: { locale: Locale }) {
   const d = getDictionary(locale)
   const item = useHeroVariants()
-  /* Entrance plays on load, so this uses `animate` rather than `whileInView`.
+  /* Entrance plays on load. It goes through the same gate as the scroll
+     reveals, for the same reason: a bare initial="hidden" would serialise the
+     hero's headline into the HTML at opacity 0, which is the first thing a
+     crawler or an at-load auditor reads. The gate renders visible on the
+     server and arms before paint, so the animation is unchanged on screen.
      Under reduced motion useStaggerVariants zeroes both stagger and delay. */
   const group = useStaggerVariants(0.12, 0.15)
+  const { ref: heroRef, animate: heroAnimate } = useRevealGate()
 
   /* Same wa.me contract as the contact section: the number without the leading
      plus, and a prefilled opener in the reader's language. */
@@ -75,6 +80,7 @@ export function Hero({ locale }: { locale: Locale }) {
       />
 
       <motion.div
+        ref={heroRef as React.Ref<HTMLDivElement>}
         data-reveal
         /* pt clears the header overlaying this section (ESPA strip + nav row).
            The block is bottom-aligned, so this only bites when the copy is tall
@@ -82,8 +88,8 @@ export function Hero({ locale }: { locale: Locale }) {
            the case where text would otherwise slide under the header. */
         className="mx-auto w-full max-w-6xl px-6 pb-20 pt-40 sm:pb-28"
         variants={group}
-        initial="hidden"
-        animate="visible"
+        initial={false}
+        animate={heroAnimate}
       >
         {/*
           `isolate` so the pool's -z-10 lands behind this text but still above

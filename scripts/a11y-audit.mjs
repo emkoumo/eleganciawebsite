@@ -579,6 +579,51 @@ async function auditLocale(browser, locale) {
   )
   check(!!offsite.maps, `Location links to Google Maps (${offsite.maps})`, 'Location is not linked to Google Maps')
 
+  // --- Nothing ships hidden in the server HTML ---------------------------
+  /* The reveals used to serialise `opacity: 0` into the markup for 22
+     elements. WAVE analyses a page at load and therefore reported three
+     genuine contrast errors on the About paragraphs — their effective opacity
+     really was 0 at that moment. The same markup is what a crawler reads, and
+     it is what a visitor is left with if JavaScript loads and then fails.
+
+     This asserts against the RAW server response, not the live DOM, because by
+     the time Puppeteer has run the reveals the evidence is gone. The browser
+     passes above are blind to this by construction. */
+  const serverHtml = await (await fetch(url)).text()
+  const hiddenInHtml = [...serverHtml.matchAll(/style="[^"]*opacity:\s*0[^."][^"]*"/g)]
+  check(
+    hiddenInHtml.length === 0,
+    'Server HTML ships nothing at opacity 0',
+    `${hiddenInHtml.length} element(s) ship hidden in the server HTML, e.g. ${hiddenInHtml[0]?.[0]?.slice(0, 60)}`,
+  )
+
+  /* And the same check through the eyes of an at-load analyser: load the page,
+     never scroll, and confirm every bit of body text is actually visible. */
+  const atLoad = await browser.newPage()
+  await atLoad.setViewport({ width: 1440, height: 900 })
+  await atLoad.goto(url, { waitUntil: 'networkidle0' })
+  await new Promise((r) => setTimeout(r, 1200))
+  const invisible = await atLoad.evaluate(() => {
+    const out = []
+    for (const el of document.querySelectorAll('main p, main h1, main h2, main h3, main li, main a')) {
+      if (!el.textContent?.trim()) continue
+      let eff = 1
+      let n = el
+      while (n && n !== document.documentElement) {
+        eff *= Number(getComputedStyle(n).opacity)
+        n = n.parentElement
+      }
+      if (eff < 0.99) out.push({ text: el.textContent.trim().slice(0, 32), eff: +eff.toFixed(2) })
+    }
+    return out
+  })
+  await atLoad.close()
+  check(
+    invisible.length === 0,
+    'All body text visible at load without scrolling',
+    `${invisible.length} element(s) still invisible at load, e.g. "${invisible[0]?.text}" at opacity ${invisible[0]?.eff}`,
+  )
+
   // --- Structure ---------------------------------------------------------
   const structure = await page.evaluate(() => {
     const headings = [...document.querySelectorAll('h1,h2,h3,h4,h5,h6')].map((h) => ({

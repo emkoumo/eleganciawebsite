@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { useRevealVariants, useStaggerVariants, revealViewport } from '@/lib/motion'
+import { useRevealGate, useRevealVariants, useStaggerVariants } from '@/lib/motion'
 
 /* ---------------------------------------------------------------------------
    Reveal / RevealGroup / RevealItem
@@ -10,8 +10,15 @@ import { useRevealVariants, useStaggerVariants, revealViewport } from '@/lib/mot
    the prefers-reduced-motion fallback is already applied. Components use these
    instead of raw <motion.div> so a reveal can't ship without a fallback.
 
-   `once: true` on the viewport satisfies the brief's "once per element, not
-   looping" requirement.
+   These used `whileInView` + `initial="hidden"`, which made Motion serialise an
+   inline `opacity: 0` into the server HTML for every reveal on the page. They
+   now drive `animate` from useRevealGate instead: the resting state is visible,
+   and the hidden state is armed on the client before first paint. See the hook
+   for why that matters. `initial={false}` is what stops Motion writing any
+   initial state into the markup.
+
+   The gate fires once and disconnects, which satisfies the brief's "once per
+   element, not looping" requirement.
 --------------------------------------------------------------------------- */
 
 type RevealProps = {
@@ -29,16 +36,17 @@ export function Reveal({
   as = 'div',
 }: RevealProps) {
   const variants = useRevealVariants(distance)
+  const { ref, animate } = useRevealGate()
   const Component = motion[as]
 
   return (
     <Component
+      ref={ref as React.Ref<never>}
       data-reveal
       className={className}
       variants={variants}
-      initial="hidden"
-      whileInView="visible"
-      viewport={revealViewport}
+      initial={false}
+      animate={animate}
     >
       {children}
     </Component>
@@ -58,16 +66,17 @@ export function RevealGroup({
   as?: 'div' | 'ul' | 'section'
 }) {
   const variants = useStaggerVariants(stagger)
+  const { ref, animate } = useRevealGate()
   const Component = motion[as]
 
   return (
     <Component
+      ref={ref as React.Ref<never>}
       data-reveal
       className={className}
       variants={variants}
-      initial="hidden"
-      whileInView="visible"
-      viewport={revealViewport}
+      initial={false}
+      animate={animate}
     >
       {children}
     </Component>
