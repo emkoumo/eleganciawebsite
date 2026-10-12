@@ -122,18 +122,18 @@ const en: Dictionary = {
     ],
     cta: 'Check availability',
   },
-  /* This section used to restate the hero almost word for word — three villas,
-     three pools, no reception — which is why it read as empty despite a tall
-     band. The hero already sells what the place IS; About now does the job
-     nothing else on the page does, which is the setting and the shape of a day
-     in it. No counts, no amenities: Highlights and Amenities own those. */
+  /* The section keeps its place and its layout; only the copy changes. It
+     originally restated the hero almost word for word — three villas, three
+     pools, no reception — which is why it read as empty despite a tall band.
+     It now states the philosophy instead, leaving counts and amenities to
+     Highlights and Amenities. */
   about: {
-    eyebrow: 'The setting',
-    heading: 'Between the mountain and the sea',
+    eyebrow: 'The philosophy',
+    heading: 'Built around what matters',
     paragraphs: [
-      'Skotina sits on the eastern slope of Olympus, with the Thermaic Gulf laid out below and the mountain still climbing behind.',
-      'Mornings belong to the pool, before the heat arrives. By late afternoon the light comes in low across the terrace and the hills turn the colour of the stone the houses are built from.',
-      'The sea is fifteen minutes down the hill; the first Olympus trailheads about as far back up it. Most people manage both in a day and still cook dinner at home.',
+      'Elegancia is three private villas, each with its own space and its own quiet. Simplicity here is a choice: clean lines, stone, light, and nothing unnecessary between you and the view.',
+      'The pool and the veranda are the centre of the day. That is where the first coffee happens, where the afternoon drifts by, and where the evening ends, once the heat has gone and the hills darken.',
+      'Luxury doesn’t mean more things. It means time, space, and a place that doesn’t need to explain itself.',
     ],
   },
   /* Captions were two or three words each ("Matte. Unlacquered.") — too clipped
@@ -259,12 +259,12 @@ const el: Dictionary = {
     cta: 'Δείτε διαθεσιμότητα',
   },
   about: {
-    eyebrow: 'Η τοποθεσία',
-    heading: 'Ανάμεσα στο βουνό και τη θάλασσα',
+    eyebrow: 'Η φιλοσοφία',
+    heading: 'Χτισμένες γύρω από ό,τι μετράει',
     paragraphs: [
-      'Η Σκοτίνα βρίσκεται στην ανατολική πλαγιά του Ολύμπου, με τον Θερμαϊκό απλωμένο από κάτω και το βουνό να συνεχίζει να ανηφορίζει από πίσω.',
-      'Τα πρωινά ανήκουν στην πισίνα, πριν ανέβει η ζέστη. Αργά το απόγευμα το φως πέφτει πλάγια στη βεράντα και οι λόφοι παίρνουν το χρώμα της πέτρας από την οποία είναι χτισμένα τα σπίτια.',
-      'Η θάλασσα είναι δεκαπέντε λεπτά πιο κάτω· τα πρώτα μονοπάτια του Ολύμπου περίπου άλλα τόσα πιο πάνω. Οι περισσότεροι προλαβαίνουν και τα δύο μέσα στην ημέρα, και μαγειρεύουν κιόλας το βράδυ.',
+      'Το Elegancia είναι τρεις ιδιωτικές βίλες, η καθεμιά με τον δικό της χώρο και τη δική της ησυχία. Η απλότητα εδώ είναι επιλογή: καθαρές γραμμές, πέτρα, φως και τίποτα περιττό ανάμεσα σε εσάς και στη θέα.',
+      'Η πισίνα και η βεράντα είναι το κέντρο της μέρας. Εκεί πίνεις τον πρώτο καφέ, εκεί κυλάει το απόγευμα, και εκεί καταλήγει το βράδυ, όταν η ζέστη έχει φύγει και ο λόφος σκουραίνει.',
+      'Πολυτέλεια δεν σημαίνει περισσότερα πράγματα. Σημαίνει χρόνος, χώρος και ένα μέρος που δεν χρειάζεται να σου εξηγήσει τίποτα.',
     ],
   },
   materials: {
