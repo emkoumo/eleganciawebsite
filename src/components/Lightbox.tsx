@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef } from 'react'
 import Image from 'next/image'
-import { AnimatePresence, motion } from 'motion/react'
+import { AnimatePresence, motion } from 'framer-motion'
 import { useLightboxVariants } from '@/lib/motion'
 import { photoSrc, type Photo } from '@/lib/photos'
 import { getDictionary, type Locale } from '@/lib/i18n'

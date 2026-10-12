@@ -1,7 +1,7 @@
 'use client'
 
 import Image from 'next/image'
-import { motion } from 'motion/react'
+import { motion } from 'framer-motion'
 import { site } from '@/lib/site'
 import { useHeroVariants, useStaggerVariants } from '@/lib/motion'
 import { getDictionary, type Locale } from '@/lib/i18n'

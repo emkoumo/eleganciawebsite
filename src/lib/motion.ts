@@ -1,7 +1,7 @@
 'use client'
 
-import { useReducedMotion } from 'motion/react'
-import type { Transition, Variants } from 'motion/react'
+import { useReducedMotion } from 'framer-motion'
+import type { Transition, Variants } from 'framer-motion'
 
 /* ---------------------------------------------------------------------------
    Motion presets

@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react'
 import Image from 'next/image'
-import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { Lightbox } from '@/components/Lightbox'
 import { Reveal } from '@/components/Reveal'
 import { useGalleryItemVariants } from '@/lib/motion'
