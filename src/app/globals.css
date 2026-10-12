@@ -157,8 +157,17 @@
      Stops are measured, not eyeballed. scripts/a11y-audit.mjs samples the real
      rendered pixels behind every hero glyph, in both locales, so a brighter
      photograph or longer copy fails here loudly instead of silently.
-     The ellipse is centred and sized to exactly 50%/50%, so it reaches full
-     transparency precisely at the element's own edges. That is the detail that
+     The ellipse is sized so it reaches full transparency at or before the
+     element's own edges on every side: 50% horizontally from a 50% centre, and
+     46% vertically from a 46% centre. It sits slightly high on purpose. The
+     eyebrow is the smallest text in the block and therefore carries the
+     strictest 4.5:1 requirement, yet it is the line nearest the pool's upper
+     falloff; the buttons at the bottom are large and had ratios to spare. A
+     46/46 pair moves the core up to match, and still zeroes before the bottom
+     edge rather than past it.
+
+     Both radii reaching zero by the boundary is the detail that keeps this
+     invisible. That is the detail that
      makes the pool invisible: an off-centre ellipse, or any radius short of the
      edge, leaves residual alpha along the boundary and the element's rectangle
      shows up as a hard seam across the photograph. The element is in turn sized
@@ -167,14 +176,14 @@
   ------------------------------------------------------------------------- */
   .hero-pool {
     -webkit-mask-image: radial-gradient(
-      ellipse 50% 50% at 50% 50%,
+      ellipse 50% 46% at 50% 46%,
       #000 0%,
       #000 56%,
       rgba(0, 0, 0, 0.42) 80%,
       transparent 100%
     );
     mask-image: radial-gradient(
-      ellipse 50% 50% at 50% 50%,
+      ellipse 50% 46% at 50% 46%,
       #000 0%,
       #000 56%,
       rgba(0, 0, 0, 0.42) 80%,

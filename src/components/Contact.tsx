@@ -125,18 +125,10 @@ export function Contact({ locale }: { locale: Locale }) {
               </a>
             </RevealItem>
 
-            {/* The phone number itself, large. The buttons above are the action;
-                this is the number you write down. */}
+            {/* The number itself used to be repeated here at display size. It
+                was the third phone control in one column — button, number,
+                footer — so it has gone; "Call us" above already dials it. */}
             <RevealItem className="mt-10">
-              <a
-                href={`tel:${site.contact.phone}`}
-                className="inline-block cursor-pointer text-[clamp(1.6rem,3.4vw,2.25rem)] font-light tracking-[-0.01em] text-sand underline decoration-sand/30 underline-offset-[6px] transition-colors duration-200 hover:text-white hover:decoration-white"
-              >
-                {site.contact.phoneDisplay}
-              </a>
-            </RevealItem>
-
-            <RevealItem className="mt-8">
               <p className="text-sm text-sand/90">{d.contact.emailIntro}</p>
               {/* break-all, not break-words: the address is one long token with
                   no spaces, so only a mid-word break keeps it inside a 320px

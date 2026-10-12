@@ -71,7 +71,7 @@ export function Hero({ locale }: { locale: Locale }) {
       */}
       <div
         aria-hidden="true"
-        className="absolute inset-0 -z-10 bg-[linear-gradient(to_top,rgba(31,27,23,0.34)_0%,rgba(31,27,23,0.20)_45%,rgba(31,27,23,0.10)_75%,rgba(31,27,23,0.04)_100%)]"
+        className="absolute inset-0 -z-10 bg-[linear-gradient(to_top,rgba(31,27,23,0.18)_0%,rgba(31,27,23,0.10)_45%,rgba(31,27,23,0.05)_75%,rgba(31,27,23,0.02)_100%)]"
       />
 
       <motion.div
@@ -103,7 +103,7 @@ export function Hero({ locale }: { locale: Locale }) {
             aria-hidden="true"
             /* Flat fill, soft mask. Extends past the text on every side so the
                falloff happens outside the glyphs rather than across them. */
-            className="hero-pool pointer-events-none absolute -inset-[50%] -z-10 bg-[rgba(31,27,23,0.93)]"
+            className="hero-pool pointer-events-none absolute -inset-[50%] -z-10 bg-[rgba(31,27,23,0.76)]"
           />
 
         <motion.p data-reveal variants={item} className="eyebrow !text-sand">

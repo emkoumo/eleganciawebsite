@@ -160,7 +160,7 @@ export function Header({ locale }: { locale: Locale }) {
           landmark, so the whole dark block reads as one header. */}
       <EspaBanner locale={locale} />
 
-      <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-6 py-4">
+      <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-6 py-2.5">
         <a
           href={home}
           aria-label={`${site.name} — ${locale === 'en' ? 'home' : 'αρχική'}`}
@@ -174,7 +174,7 @@ export function Header({ locale }: { locale: Locale }) {
             width={545}
             height={138}
             priority
-            className="h-8 w-auto sm:h-9"
+            className="h-11 w-auto sm:h-12"
           />
           <span className="sr-only">{site.name}</span>
         </a>
