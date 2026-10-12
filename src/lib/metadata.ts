@@ -10,13 +10,11 @@ import { getDictionary, type Locale } from '@/lib/i18n'
    duplicate content. x-default points at English as the primary locale.
 --------------------------------------------------------------------------- */
 
-/* The hero's three short lines are the natural meta description: they already
-   say what the place is, where it is, and what you get. Joined with spaces so
-   search results read as prose rather than three fragments. */
-function metaDescription(d: ReturnType<typeof getDictionary>): string {
-  return `${d.hero.subheading}. ${d.hero.lines.join(' ')}`
-}
-
+/* The description used to be built by joining the hero's three summary lines.
+   Those lines are gone, and stitching page copy into search copy was fragile
+   anyway — a hero rewrite silently rewrote what Google shows. It is now its
+   own string per locale, in the dictionary.
+*/
 export function buildMetadata(locale: Locale): Metadata {
   const d = getDictionary(locale)
   const title = `${site.name} — ${d.hero.location}`
@@ -24,7 +22,7 @@ export function buildMetadata(locale: Locale): Metadata {
   return {
     metadataBase: new URL(site.url),
     title: { default: title, template: `%s — ${site.name}` },
-    description: metaDescription(d),
+    description: d.metaDescription,
     alternates: {
       canonical: locale === 'en' ? '/' : '/el',
       languages: {
@@ -35,7 +33,7 @@ export function buildMetadata(locale: Locale): Metadata {
     },
     openGraph: {
       title,
-      description: metaDescription(d),
+      description: d.metaDescription,
       locale: locale === 'en' ? 'en_GB' : 'el_GR',
       alternateLocale: locale === 'en' ? 'el_GR' : 'en_GB',
       type: 'website',

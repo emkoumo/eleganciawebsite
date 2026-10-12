@@ -68,30 +68,48 @@ export function Gallery({ locale }: { locale: Locale }) {
           tab pattern we don't fully implement would mislead screen-reader users
           about what the arrow keys do.
         */}
+        {/*
+          On a phone the six filters wrapped onto three ragged rows and pushed
+          the grid down a third of a screen. They now sit on one row that
+          scrolls sideways, which is the behaviour a phone user already expects
+          from a filter strip. From `sm` up there is room for all six, so it
+          reverts to a plain wrapping row and the scroll container does nothing.
+
+          The row bleeds past the container's px-6 with -mx-6 and re-pads
+          itself, so the last chip runs to the screen edge instead of stopping
+          short — the half-visible chip is what signals there is more.
+
+          No tabindex on the scroller: its children are buttons, so keyboard
+          users reach every option by tabbing and the browser scrolls each one
+          into view on focus. Adding a tabindex would only insert a stop that
+          lands on nothing.
+        */}
         <Reveal className="mt-12">
-          <div
-            role="group"
-            aria-label={d.gallery.filterLabel}
-            className="flex flex-wrap gap-2 border-b border-bronze/20 pb-5"
-          >
-            {d.gallery.filters.map((f) => {
-              const isActive = filter === f.id
-              return (
-                <button
-                  key={f.id}
-                  type="button"
-                  onClick={() => changeFilter(f.id)}
-                  aria-pressed={isActive}
-                  className={`tap-target cursor-pointer rounded-sm px-4 text-sm font-medium transition-colors duration-200 ${
-                    isActive
-                      ? 'bg-bronze text-white'
-                      : 'text-bronze-deep hover:bg-bronze/10'
-                  }`}
-                >
-                  {f.label}
-                </button>
-              )
-            })}
+          <div className="border-b border-bronze/20 pb-5">
+            <div
+              role="group"
+              aria-label={d.gallery.filterLabel}
+              className="-mx-6 flex gap-2 overflow-x-auto px-6 [-ms-overflow-style:none] [scrollbar-width:none] sm:mx-0 sm:flex-wrap sm:overflow-x-visible sm:px-0 [&::-webkit-scrollbar]:hidden"
+            >
+              {d.gallery.filters.map((f) => {
+                const isActive = filter === f.id
+                return (
+                  <button
+                    key={f.id}
+                    type="button"
+                    onClick={() => changeFilter(f.id)}
+                    aria-pressed={isActive}
+                    className={`tap-target shrink-0 cursor-pointer whitespace-nowrap rounded-sm px-4 text-sm font-medium transition-colors duration-200 ${
+                      isActive
+                        ? 'bg-bronze text-white'
+                        : 'text-bronze-deep hover:bg-bronze/10'
+                    }`}
+                  >
+                    {f.label}
+                  </button>
+                )
+              })}
+            </div>
           </div>
         </Reveal>
 

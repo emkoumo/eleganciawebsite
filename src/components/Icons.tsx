@@ -114,4 +114,118 @@ export const amenityIcons: Record<AmenityIcon, React.ReactElement> = {
       <path d="M7 15.5v1M12 15.5v2.5M17 15.5v1" />
     </svg>
   ),
+
+  /* Added when the full amenity inventory moved into this section. Every item
+     carries its own icon rather than sharing one per category, because the
+     section's whole design idea is an icon beside each line. `sofa` is used for
+     both the outdoor lounge and the sofa bed — the same object in two places. */
+  lounger: (
+    <svg {...base}>
+      <path d="M2.5 20h19" />
+      <path d="M5 20l1.6-5.5h7.4l4.5-7" />
+      <path d="M6.6 14.5l-.9-3.2 7.6-2.2 1 3" />
+    </svg>
+  ),
+  sofa: (
+    <svg {...base}>
+      <path d="M3 11V8.5A2.5 2.5 0 015.5 6h13A2.5 2.5 0 0121 8.5V11" />
+      <path d="M2 11.5a2 2 0 012 2V17h16v-3.5a2 2 0 012-2" />
+      <path d="M6.5 11h11" />
+      <path d="M6 17v2M18 17v2" />
+    </svg>
+  ),
+  dining: (
+    <svg {...base}>
+      <path d="M3 9c0-3.3 4-6 9-6s9 2.7 9 6z" />
+      <path d="M12 9v12" />
+      <path d="M8.5 21h7" />
+    </svg>
+  ),
+  espresso: (
+    <svg {...base}>
+      <path d="M4 9h12v5a4 4 0 01-4 4H8a4 4 0 01-4-4V9z" />
+      <path d="M16 10h1.5a2.5 2.5 0 010 5H16" />
+      <path d="M3 21h14" />
+      <path d="M7.5 3.5c0 .9-.9 1.3-.9 2.2M11.5 3.5c0 .9-.9 1.3-.9 2.2" />
+    </svg>
+  ),
+  kettle: (
+    <svg {...base}>
+      <path d="M5 11h10v6a3 3 0 01-3 3H8a3 3 0 01-3-3v-6z" />
+      <path d="M15 12.5L19.5 10" />
+      <path d="M7.5 11V9.5a2.5 2.5 0 015 0V11" />
+      <path d="M4 20.5h12" />
+    </svg>
+  ),
+  toaster: (
+    <svg {...base}>
+      <rect x="3" y="10" width="18" height="9" rx="2" />
+      <path d="M8 10V8.6a1.6 1.6 0 013.2 0V10" />
+      <path d="M12.8 10V8.6a1.6 1.6 0 013.2 0V10" />
+      <path d="M6.5 15h5" />
+    </svg>
+  ),
+  linen: (
+    <svg {...base}>
+      <rect x="3" y="6" width="18" height="5" rx="1" />
+      <rect x="3" y="13" width="18" height="5" rx="1" />
+      <path d="M8 6v5M8 13v5" />
+    </svg>
+  ),
+  wardrobe: (
+    <svg {...base}>
+      <rect x="4" y="3" width="16" height="18" rx="1.5" />
+      <path d="M12 3v18" />
+      <path d="M10 11v2M14 11v2" />
+    </svg>
+  ),
+  towel: (
+    <svg {...base}>
+      <path d="M3 5h18" />
+      <path d="M7 5v11a2 2 0 002 2h6a2 2 0 002-2V5" />
+      <path d="M7 9.5h10" />
+    </svg>
+  ),
+  hairdryer: (
+    <svg {...base}>
+      <path d="M3 10a4 4 0 014-4h6l6-2.5v13L13 14H7a4 4 0 01-4-4z" />
+      <path d="M8.5 14l1.3 6.5" />
+    </svg>
+  ),
+  key: (
+    <svg {...base}>
+      <circle cx="7.5" cy="12" r="4" />
+      <path d="M11.5 12H21" />
+      <path d="M17.5 12v3.5M20 12v2.5" />
+    </svg>
+  ),
+  lockbox: (
+    <svg {...base}>
+      <rect x="3" y="9" width="18" height="11" rx="2" />
+      <path d="M7.5 9V6.5a4.5 4.5 0 019 0V9" />
+      <circle cx="12" cy="14.5" r="1.5" />
+    </svg>
+  ),
+  washer: (
+    <svg {...base}>
+      <rect x="3.5" y="3" width="17" height="18" rx="2" />
+      <circle cx="12" cy="14" r="4.5" />
+      <circle cx="12" cy="14" r="1.6" />
+      <path d="M7 6.5h.01M10 6.5h.01" />
+    </svg>
+  ),
+  iron: (
+    <svg {...base}>
+      <path d="M3 17h15a3 3 0 003-3v-1H8a5 5 0 00-5 4z" />
+      <path d="M8 13V9.5A2.5 2.5 0 0110.5 7h5A2.5 2.5 0 0118 9.5V13" />
+      <path d="M4 20.5h14" />
+    </svg>
+  ),
+  cot: (
+    <svg {...base}>
+      <path d="M3 6v14M21 6v14" />
+      <path d="M3 10h18M3 19.5h18" />
+      <path d="M7.5 10v9.5M12 10v9.5M16.5 10v9.5" />
+    </svg>
+  ),
 }

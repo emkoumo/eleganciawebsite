@@ -22,6 +22,9 @@ export function localePath(locale: Locale, hash = ''): string {
 export type AmenityIcon =
   | 'pool' | 'hottub' | 'bed' | 'bath' | 'guests' | 'bbq'
   | 'kitchen' | 'garden' | 'parking' | 'wifi' | 'tv' | 'ac'
+  | 'lounger' | 'sofa' | 'dining' | 'espresso' | 'kettle' | 'toaster'
+  | 'linen' | 'wardrobe' | 'towel' | 'hairdryer' | 'key' | 'lockbox'
+  | 'washer' | 'iron' | 'cot'
 
 export type Dictionary = {
   htmlLang: string
@@ -33,33 +36,30 @@ export type Dictionary = {
   nav: { about: string; amenities: string; gallery: string; contact: string; book: string }
   opensNewTab: string
   bookOnBooking: string
+  /* Search-result description. Its own string rather than a join of hero
+     fragments: it has to read as one sentence to a stranger who has not seen
+     the page, and it must survive the hero copy being rewritten. ~155
+     characters, which is roughly where Google truncates. */
+  metaDescription: string
   hero: {
     location: string
     headline: string
     subheading: string
-    /* Three short lines, each rendered on its own row. Kept as an array rather
-       than one paragraph so the three-beat rhythm survives every breakpoint
-       instead of reflowing into a block. */
-    lines: [string, string, string]
-    cta: string
+    /* Two direct routes rather than one link out to Booking.com. The header
+       still carries the Booking button, so the hero is free to put a human on
+       the other end of the first tap. */
+    ctaCall: string
+    ctaMessage: string
   }
   about: { eyebrow: string; heading: string; paragraphs: string[] }
-  /* Four materials, each with one close-up. This is what the detail
-     photographs are for — they say more about the aesthetic than prose can. */
-  materials: {
+  /* Highlights absorbed the former Amenities section: one inventory, grouped
+     by where you meet it, every line with its own icon. Two sections listing
+     overlapping subsets of the same facts — twelve "highlights" above, the
+     full twenty-nine below — made the visitor read the same thing twice. */
+  highlights: {
     eyebrow: string
     heading: string
-    items: { name: string; note: string; photo: string }[]
-  }
-  /* The villas section was removed — three identical villas gave it nothing
-     useful to say. The names survive only to populate the contact form's
-     "which villa interests you?" dropdown. */
-  villas: { names: [string, string, string] }
-  highlights: { eyebrow: string; heading: string; items: { label: string; icon: AmenityIcon }[] }
-  amenities: {
-    eyebrow: string
-    heading: string
-    groups: { title: string; items: string[] }[]
+    groups: { title: string; items: { label: string; icon: AmenityIcon }[] }[]
     stayNote: string
   }
   gallery: {
@@ -111,16 +111,14 @@ const en: Dictionary = {
   nav: { about: 'About', amenities: 'Amenities', gallery: 'Gallery', contact: 'Contact', book: 'Book' },
   opensNewTab: '(opens in a new tab)',
   bookOnBooking: 'on Booking.com',
+  metaDescription:
+    'Three private villas on the slope between Mount Olympus and the Aegean, each with its own pool and hot tub, for up to six guests. Skotina, Pieria.',
   hero: {
     location: 'Skotina, Pieria, Greece',
     headline: 'Where simplicity meets luxury',
     subheading: 'Private villas built around what matters',
-    lines: [
-      'Three villas on the slope between Mount Olympus and the Aegean.',
-      'Each with its own pool and hot tub, for up to six guests.',
-      'No lobby, no reception — you arrive on your own schedule.',
-    ],
-    cta: 'Check availability',
+    ctaCall: 'Call us',
+    ctaMessage: 'Message us',
   },
   /* The section keeps its place and its layout; only the copy changes. It
      originally restated the hero almost word for word — three villas, three
@@ -136,48 +134,69 @@ const en: Dictionary = {
       'Luxury doesn’t mean more things. It means time, space, and a place that doesn’t need to explain itself.',
     ],
   },
-  /* Captions were two or three words each ("Matte. Unlacquered.") — too clipped
-     to tell a guest anything. Each one now gives the material and the reason it
-     was chosen, which is the whole argument of the section. */
-  materials: {
-    eyebrow: 'Made of',
-    heading: 'Four materials, nothing more',
-    items: [
-      { name: 'Natural stone', note: 'Quarried in Pieria, left rough where it meets the living room.', photo: 'living-stone-wall.jpg' },
-      { name: 'Pale oak', note: 'Unlacquered, so it warms and darkens a little with use instead of staying new.', photo: 'kitchen-shelf.jpg' },
-      { name: 'Microcement', note: 'Poured in one piece through the bathrooms. No grout lines, and cool underfoot in August.', photo: 'bathroom-tap-detail.jpg' },
-      { name: 'Linen', note: 'Washed before it ever reaches the bed, which is why it feels soft and falls heavy.', photo: 'bedroom-cushion-detail.jpg' },
-    ],
-  },
-  villas: { names: ['Villa 1', 'Villa 2', 'Villa 3'] },
   highlights: {
-    eyebrow: 'Highlights',
-    heading: 'What matters',
-    items: [
-      { label: 'Private pool', icon: 'pool' },
-      { label: 'Private hot tub', icon: 'hottub' },
-      { label: '2 master bedrooms', icon: 'bed' },
-      { label: '2 bathrooms', icon: 'bath' },
-      { label: 'Up to 6 guests', icon: 'guests' },
-      { label: 'BBQ', icon: 'bbq' },
-      { label: 'Fully equipped kitchen', icon: 'kitchen' },
-      { label: 'Private garden', icon: 'garden' },
-      { label: 'Free private parking', icon: 'parking' },
-      { label: 'High-speed Wi-Fi', icon: 'wifi' },
-      { label: 'Smart TVs', icon: 'tv' },
-      { label: 'Air conditioning throughout', icon: 'ac' },
-    ],
-  },
-  amenities: {
     eyebrow: 'Amenities',
-    heading: 'Already here',
+    heading: 'Everything already here',
     groups: [
-      { title: 'Outdoors', items: ['Private pool', 'Private hot tub', 'Sun loungers', 'Lounge area', 'BBQ', 'Outdoor dining', 'Garden', 'Private parking'] },
-      { title: 'Living room', items: ['Smart TV', 'Sofa bed'] },
-      { title: 'Kitchen', items: ['Fully equipped', 'Espresso machine', 'Kettle', 'Toaster'] },
-      { title: 'Bedrooms', items: ['2 master bedrooms', 'Premium bed linen', 'Wardrobes', 'Smart TV'] },
-      { title: 'Bathrooms', items: ['2 modern bathrooms', 'Towels provided', 'Hairdryer'] },
-      { title: 'Also included', items: ['Wi-Fi', 'Self check-in', 'Lockbox', 'Washing machine', 'Iron', 'Baby cot on request'] },
+      {
+        title: 'Outdoors',
+        items: [
+          { label: 'Private pool', icon: 'pool' },
+          { label: 'Private hot tub', icon: 'hottub' },
+          { label: 'Sun loungers', icon: 'lounger' },
+          { label: 'Lounge area', icon: 'sofa' },
+          { label: 'BBQ', icon: 'bbq' },
+          { label: 'Outdoor dining', icon: 'dining' },
+          { label: 'Private garden', icon: 'garden' },
+          { label: 'Free private parking', icon: 'parking' },
+        ],
+      },
+      {
+        title: 'Living room',
+        items: [
+          { label: 'Smart TV', icon: 'tv' },
+          { label: 'Sofa bed', icon: 'sofa' },
+        ],
+      },
+      {
+        title: 'Kitchen',
+        items: [
+          { label: 'Fully equipped', icon: 'kitchen' },
+          { label: 'Espresso machine', icon: 'espresso' },
+          { label: 'Kettle', icon: 'kettle' },
+          { label: 'Toaster', icon: 'toaster' },
+        ],
+      },
+      {
+        title: 'Bedrooms',
+        items: [
+          { label: '2 master bedrooms', icon: 'bed' },
+          { label: 'Up to 6 guests', icon: 'guests' },
+          { label: 'Premium bed linen', icon: 'linen' },
+          { label: 'Wardrobes', icon: 'wardrobe' },
+          { label: 'Smart TV', icon: 'tv' },
+        ],
+      },
+      {
+        title: 'Bathrooms',
+        items: [
+          { label: '2 modern bathrooms', icon: 'bath' },
+          { label: 'Towels provided', icon: 'towel' },
+          { label: 'Hairdryer', icon: 'hairdryer' },
+        ],
+      },
+      {
+        title: 'Also included',
+        items: [
+          { label: 'High-speed Wi-Fi', icon: 'wifi' },
+          { label: 'Air conditioning throughout', icon: 'ac' },
+          { label: 'Self check-in', icon: 'key' },
+          { label: 'Lockbox', icon: 'lockbox' },
+          { label: 'Washing machine', icon: 'washer' },
+          { label: 'Iron', icon: 'iron' },
+          { label: 'Baby cot on request', icon: 'cot' },
+        ],
+      },
     ],
     stayNote:
       'Check-in 15:00 – 22:00. Check-out by 11:00. Self check-in by lockbox.',
@@ -247,16 +266,14 @@ const el: Dictionary = {
   nav: { about: 'Το συγκρότημα', amenities: 'Παροχές', gallery: 'Φωτογραφίες', contact: 'Επικοινωνία', book: 'Κράτηση' },
   opensNewTab: '(ανοίγει σε νέα καρτέλα)',
   bookOnBooking: 'στο Booking.com',
+  metaDescription:
+    'Τρεις ιδιωτικές βίλες στην πλαγιά ανάμεσα στον Όλυμπο και το Αιγαίο, η καθεμιά με δική της πισίνα και υδρομασάζ, για έως έξι επισκέπτες. Σκοτίνα, Πιερία.',
   hero: {
     location: 'Σκοτίνα, Πιερία, Ελλάδα',
     headline: 'Εκεί που η απλότητα συναντά την πολυτέλεια',
     subheading: 'Ιδιωτικές βίλες χτισμένες γύρω από αυτό που έχει σημασία',
-    lines: [
-      'Τρεις βίλες στην πλαγιά ανάμεσα στον Όλυμπο και το Αιγαίο.',
-      'Κάθε μία με ιδιωτική πισίνα και υδρομασάζ, για έως έξι επισκέπτες.',
-      'Χωρίς υποδοχή — φτάνετε στον δικό σας χρόνο.',
-    ],
-    cta: 'Δείτε διαθεσιμότητα',
+    ctaCall: 'Καλέστε μας',
+    ctaMessage: 'Στείλτε μήνυμα',
   },
   about: {
     eyebrow: 'Η φιλοσοφία',
@@ -267,45 +284,69 @@ const el: Dictionary = {
       'Πολυτέλεια δεν σημαίνει περισσότερα πράγματα. Σημαίνει χρόνος, χώρος και ένα μέρος που δεν χρειάζεται να σου εξηγήσει τίποτα.',
     ],
   },
-  materials: {
-    eyebrow: 'Υλικά',
-    heading: 'Τέσσερα υλικά, τίποτα άλλο',
-    items: [
-      { name: 'Φυσική πέτρα', note: 'Από λατομεία της Πιερίας, αφημένη αδρή εκεί που συναντά το σαλόνι.', photo: 'living-stone-wall.jpg' },
-      { name: 'Ανοιχτή δρυς', note: 'Χωρίς βερνίκι, ώστε να ζεσταίνει και να σκουραίνει λίγο με τη χρήση αντί να μένει καινούργια.', photo: 'kitchen-shelf.jpg' },
-      { name: 'Μικροτσιμέντο', note: 'Χυτό σε ένα κομμάτι σε όλα τα μπάνια. Χωρίς αρμούς, και δροσερό τον Αύγουστο.', photo: 'bathroom-tap-detail.jpg' },
-      { name: 'Λινό', note: 'Πλυμένο πριν φτάσει καν στο κρεβάτι — γι’ αυτό είναι μαλακό και πέφτει βαρύ.', photo: 'bedroom-cushion-detail.jpg' },
-    ],
-  },
-  villas: { names: ['Βίλα 1', 'Βίλα 2', 'Βίλα 3'] },
   highlights: {
-    eyebrow: 'Τα σημαντικά',
-    heading: 'Αυτά που μετρούν',
-    items: [
-      { label: 'Ιδιωτική πισίνα', icon: 'pool' },
-      { label: 'Ιδιωτικό υδρομασάζ', icon: 'hottub' },
-      { label: '2 Master υπνοδωμάτια', icon: 'bed' },
-      { label: '2 Μπάνια', icon: 'bath' },
-      { label: 'Έως 6 επισκέπτες', icon: 'guests' },
-      { label: 'BBQ', icon: 'bbq' },
-      { label: 'Πλήρως εξοπλισμένη κουζίνα', icon: 'kitchen' },
-      { label: 'Ιδιωτικός κήπος', icon: 'garden' },
-      { label: 'Δωρεάν ιδιωτικό πάρκινγκ', icon: 'parking' },
-      { label: 'Wi-Fi υψηλής ταχύτητας', icon: 'wifi' },
-      { label: 'Smart TVs', icon: 'tv' },
-      { label: 'Κλιματισμός σε όλους τους χώρους', icon: 'ac' },
-    ],
-  },
-  amenities: {
     eyebrow: 'Παροχές',
-    heading: 'Όλα εδώ',
+    heading: 'Όλα είναι ήδη εδώ',
     groups: [
-      { title: 'Εξωτερικοί χώροι', items: ['Ιδιωτική πισίνα', 'Ιδιωτικό υδρομασάζ', 'Ξαπλώστρες', 'Χώρος lounge', 'BBQ', 'Εξωτερική τραπεζαρία', 'Κήπος', 'Ιδιωτικό πάρκινγκ'] },
-      { title: 'Σαλόνι', items: ['Smart TV', 'Καναπές-κρεβάτι'] },
-      { title: 'Κουζίνα', items: ['Πλήρως εξοπλισμένη', 'Μηχανή espresso', 'Βραστήρας', 'Τοστιέρα'] },
-      { title: 'Υπνοδωμάτια', items: ['2 Master υπνοδωμάτια', 'Premium κλινοσκεπάσματα', 'Ντουλάπες', 'Smart TV'] },
-      { title: 'Μπάνια', items: ['2 μοντέρνα μπάνια', 'Πετσέτες', 'Πιστολάκι'] },
-      { title: 'Επιπλέον', items: ['Wi-Fi', 'Self check-in', 'Lockbox', 'Πλυντήριο ρούχων', 'Σίδερο', 'Βρεφική κούνια (κατόπιν αιτήματος)'] },
+      {
+        title: 'Εξωτερικοί χώροι',
+        items: [
+          { label: 'Ιδιωτική πισίνα', icon: 'pool' },
+          { label: 'Ιδιωτικό υδρομασάζ', icon: 'hottub' },
+          { label: 'Ξαπλώστρες', icon: 'lounger' },
+          { label: 'Χώρος lounge', icon: 'sofa' },
+          { label: 'BBQ', icon: 'bbq' },
+          { label: 'Εξωτερική τραπεζαρία', icon: 'dining' },
+          { label: 'Ιδιωτικός κήπος', icon: 'garden' },
+          { label: 'Δωρεάν ιδιωτικό πάρκινγκ', icon: 'parking' },
+        ],
+      },
+      {
+        title: 'Σαλόνι',
+        items: [
+          { label: 'Smart TV', icon: 'tv' },
+          { label: 'Καναπές-κρεβάτι', icon: 'sofa' },
+        ],
+      },
+      {
+        title: 'Κουζίνα',
+        items: [
+          { label: 'Πλήρως εξοπλισμένη', icon: 'kitchen' },
+          { label: 'Μηχανή espresso', icon: 'espresso' },
+          { label: 'Βραστήρας', icon: 'kettle' },
+          { label: 'Τοστιέρα', icon: 'toaster' },
+        ],
+      },
+      {
+        title: 'Υπνοδωμάτια',
+        items: [
+          { label: '2 Master υπνοδωμάτια', icon: 'bed' },
+          { label: 'Έως 6 επισκέπτες', icon: 'guests' },
+          { label: 'Premium κλινοσκεπάσματα', icon: 'linen' },
+          { label: 'Ντουλάπες', icon: 'wardrobe' },
+          { label: 'Smart TV', icon: 'tv' },
+        ],
+      },
+      {
+        title: 'Μπάνια',
+        items: [
+          { label: '2 μοντέρνα μπάνια', icon: 'bath' },
+          { label: 'Πετσέτες', icon: 'towel' },
+          { label: 'Πιστολάκι', icon: 'hairdryer' },
+        ],
+      },
+      {
+        title: 'Επιπλέον',
+        items: [
+          { label: 'Wi-Fi υψηλής ταχύτητας', icon: 'wifi' },
+          { label: 'Κλιματισμός σε όλους τους χώρους', icon: 'ac' },
+          { label: 'Self check-in', icon: 'key' },
+          { label: 'Lockbox', icon: 'lockbox' },
+          { label: 'Πλυντήριο ρούχων', icon: 'washer' },
+          { label: 'Σίδερο', icon: 'iron' },
+          { label: 'Βρεφική κούνια (κατόπιν αιτήματος)', icon: 'cot' },
+        ],
+      },
     ],
     stayNote:
       'Check-in 15:00 – 22:00. Check-out έως 11:00. Self check-in με lockbox.',

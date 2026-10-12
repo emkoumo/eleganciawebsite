@@ -35,7 +35,10 @@ export function Header({ locale }: { locale: Locale }) {
 
   const navLinks = [
     { href: '#about', label: d.nav.about },
-    { href: '#amenities', label: d.nav.amenities },
+    /* The Amenities section was folded into Highlights; the nav label stays
+       "Amenities" because that is what a visitor is looking for, but the
+       anchor has to follow the content. */
+    { href: '#highlights', label: d.nav.amenities },
     { href: '#gallery', label: d.nav.gallery },
     { href: '#contact', label: d.nav.contact },
   ]

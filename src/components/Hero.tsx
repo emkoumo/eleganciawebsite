@@ -14,6 +14,12 @@ export function Hero({ locale }: { locale: Locale }) {
      Under reduced motion useStaggerVariants zeroes both stagger and delay. */
   const group = useStaggerVariants(0.12, 0.15)
 
+  /* Same wa.me contract as the contact section: the number without the leading
+     plus, and a prefilled opener in the reader's language. */
+  const waHref = `https://wa.me/${site.contact.whatsapp}?text=${encodeURIComponent(
+    d.contact.whatsappMessage,
+  )}`
+
   return (
     <section
       /* `on-dark` switches focus rings to champagne for the CTA below. */
@@ -125,42 +131,54 @@ export function Hero({ locale }: { locale: Locale }) {
           {d.hero.subheading}
         </motion.p>
 
-        {/* Three short lines, each on its own row — the quiet three-beat rhythm
-            is the point, so they are not merged into a paragraph. */}
+        {/*
+          Two direct routes instead of one link out to Booking.com.
+
+          The three summary lines that used to sit here were removed: they
+          restated the subheading above and the Amenities grid below, and they
+          pushed the call to action most of a screen further down.
+
+          Call is primary because it is the fastest answer for someone deciding
+          tonight; Message is the same conversation for someone who would
+          rather not ring a stranger abroad. Booking.com has not disappeared —
+          it is the Book button in the header, on every screen.
+        */}
         <motion.div
           data-reveal
           variants={item}
-          className="mt-7 max-w-md space-y-1.5 text-sm leading-relaxed text-sand/90 sm:text-base"
+          className="mt-10 flex flex-wrap items-center gap-3"
         >
-          {d.hero.lines.map((line) => (
-            <p key={line}>{line}</p>
-          ))}
-        </motion.div>
-
-        <motion.div data-reveal variants={item} className="mt-10">
           <a
-            href={site.bookingUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="tap-target group inline-flex cursor-pointer items-center gap-3 rounded-sm bg-sand px-7 text-sm font-medium tracking-wide text-espresso transition-colors duration-200 hover:bg-champagne"
+            href={`tel:${site.contact.phone}`}
+            className="tap-target inline-flex cursor-pointer items-center gap-3 rounded-sm bg-sand px-7 text-sm font-medium tracking-wide text-espresso transition-colors duration-200 hover:bg-champagne"
           >
-            {d.hero.cta}
-            <span className="sr-only">
-              {' '}
-              {d.bookOnBooking} {d.opensNewTab}
-            </span>
             <svg
-              width="16"
-              height="16"
-              viewBox="0 0 16 16"
+              width="17"
+              height="17"
+              viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
-              strokeWidth="1.5"
+              strokeWidth="1.6"
+              strokeLinecap="round"
+              strokeLinejoin="round"
               aria-hidden="true"
-              className="transition-transform duration-200 group-hover:translate-x-0.5 motion-reduce:transition-none motion-reduce:group-hover:translate-x-0"
             >
-              <path d="M2 8h11M9 4l4 4-4 4" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3.1 19.5 19.5 0 01-6-6A19.8 19.8 0 012.1 4.2 2 2 0 014.1 2h3a2 2 0 012 1.7c.1 1 .4 1.9.7 2.8a2 2 0 01-.5 2.1L8.1 9.9a16 16 0 006 6l1.3-1.2a2 2 0 012.1-.5c.9.3 1.8.6 2.8.7a2 2 0 011.7 2z" />
             </svg>
+            {d.hero.ctaCall}
+          </a>
+
+          <a
+            href={waHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="tap-target inline-flex cursor-pointer items-center gap-3 rounded-sm border border-sand px-7 text-sm font-medium tracking-wide text-sand transition-colors duration-200 hover:bg-sand hover:text-espresso"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.87 9.87 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2Zm0 18.15h-.01a8.2 8.2 0 0 1-4.19-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.22 8.22 0 0 1-1.26-4.38c0-4.54 3.7-8.23 8.25-8.23 2.2 0 4.27.86 5.83 2.41a8.18 8.18 0 0 1 2.41 5.83c0 4.54-3.7 8.23-8.24 8.23Zm4.52-6.16c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.13-.16.24-.64.8-.78.97-.15.16-.29.18-.54.06-.25-.12-1.05-.39-1.99-1.23-.74-.66-1.23-1.47-1.38-1.72-.14-.25-.01-.38.11-.5.11-.11.25-.29.37-.44.12-.15.16-.25.25-.41.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.41-.42-.56-.43h-.48c-.17 0-.43.06-.66.31-.23.25-.86.85-.86 2.07 0 1.22.89 2.4 1.01 2.56.12.17 1.75 2.67 4.23 3.74.59.26 1.05.41 1.41.52.59.19 1.13.16 1.56.1.47-.07 1.47-.6 1.67-1.18.21-.58.21-1.07.15-1.18-.06-.1-.23-.16-.48-.29Z" />
+            </svg>
+            {d.hero.ctaMessage}
+            <span className="sr-only"> WhatsApp {d.opensNewTab}</span>
           </a>
         </motion.div>
       </motion.div>
