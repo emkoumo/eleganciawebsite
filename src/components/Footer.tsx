@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import { site } from '@/lib/site'
-import { getDictionary, localePath, type Locale } from '@/lib/i18n'
+import { getDictionary, type Locale } from '@/lib/i18n'
 
 export function Footer({ locale }: { locale: Locale }) {
   /* Year is computed at build time. These pages are fully static, so it is
@@ -9,8 +9,6 @@ export function Footer({ locale }: { locale: Locale }) {
      1 January. Acceptable for a marketing site that redeploys on every edit. */
   const year = new Date().getFullYear()
   const d = getDictionary(locale)
-  const other: Locale = locale === 'en' ? 'el' : 'en'
-  const otherName = getDictionary(other).localeName
 
   return (
     /* `on-dark` switches focus rings to champagne (5.62:1 on espresso). */
@@ -25,22 +23,36 @@ export function Footer({ locale }: { locale: Locale }) {
               height={138}
               className="h-10 w-auto"
             />
-            <p className="mt-6 max-w-xs text-pretty text-sm leading-relaxed text-sand/90">
-              {d.hero.location}
+            {/* The hero's two lines, repeated here as a sign-off. Not headings:
+                they restate the promise, they do not title anything, and an h2
+                would push into the page outline for no reason.
+
+                The language link that used to sit here has gone — the header
+                carries it on every screen, and a second switcher in the footer
+                is a second thing to maintain in two places. */}
+            <p className="mt-6 max-w-xs text-pretty text-sm leading-relaxed text-sand">
+              {d.hero.headline}
             </p>
-            <a
-              href={localePath(other)}
-              hrefLang={other}
-              lang={other}
-              aria-label={d.switchToAria}
-              className="tap-target mt-6 inline-flex cursor-pointer items-center text-sm font-medium text-champagne underline decoration-champagne/40 underline-offset-4 transition-colors duration-200 hover:text-white hover:decoration-white"
-            >
-              {otherName}
-            </a>
+            <p className="mt-1.5 max-w-xs text-pretty text-sm leading-relaxed text-sand/90">
+              {d.hero.subheading}
+            </p>
           </div>
 
           <div className="md:col-span-3">
             <h2 className="eyebrow">{d.footer.stay}</h2>
+
+            {/* The full rules as a PDF, per locale. The link names the format,
+                because a link that silently downloads a file is a surprise. */}
+            <a
+              href={d.footer.houseRulesPdf}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="tap-target mt-3 inline-flex cursor-pointer items-center text-sm font-medium text-champagne underline decoration-champagne/40 underline-offset-4 transition-colors duration-200 hover:text-white hover:decoration-white"
+            >
+              {d.footer.houseRules}
+              <span className="sr-only"> {d.opensNewTab}</span>
+            </a>
+
             <dl className="mt-4 space-y-2 text-sm">
               <div className="flex flex-wrap gap-x-2">
                 <dt className="text-champagne">{d.footer.checkIn}</dt>
@@ -80,14 +92,6 @@ export function Footer({ locale }: { locale: Locale }) {
               </li>
             </ul>
 
-            {/* Points at the contact section rather than Booking.com — every
-                route off this page now ends with the owners, not a platform. */}
-            <a
-              href="#contact"
-              className="tap-target mt-6 inline-flex cursor-pointer items-center rounded-sm border border-champagne px-5 text-sm font-medium transition-colors duration-200 hover:bg-champagne hover:text-espresso"
-            >
-              {d.nav.book}
-            </a>
           </div>
         </div>
 

@@ -33,6 +33,10 @@ export function Header({ locale }: { locale: Locale }) {
   const other: Locale = locale === 'en' ? 'el' : 'en'
   const home = localePath(locale)
 
+  const waHref = `https://wa.me/${site.contact.whatsapp}?text=${encodeURIComponent(
+    d.contact.whatsappMessage,
+  )}`
+
   const navLinks = [
     { href: '#about', label: d.nav.about },
     /* The Amenities section was folded into Highlights; the nav label stays
@@ -43,10 +47,22 @@ export function Header({ locale }: { locale: Locale }) {
     { href: '#contact', label: d.nav.contact },
   ]
 
-  const close = useCallback(() => {
+  /* restoreFocus is opt-in because returning focus to the toggle makes the
+     browser paint a focus ring on it, and after a tap or a click that ring is
+     just a box sitting in the header with nothing to explain it. Keyboard
+     users still need focus back — losing it would drop them to the top of the
+     document — so Escape and keyboard activation pass true, pointer does not. */
+  const close = useCallback((restoreFocus = false) => {
     setMenuOpen(false)
-    toggleRef.current?.focus()
+    if (restoreFocus) toggleRef.current?.focus()
   }, [])
+
+  /* A click event from the keyboard reports detail 0; a real pointer click
+     reports 1 or more. */
+  const closeFromEvent = useCallback(
+    (e: React.MouseEvent) => close(e.detail === 0),
+    [close],
+  )
 
   /* Escape closes and returns focus to the toggle, and Tab is kept inside the
      panel. A full-screen overlay that leaves focus behind it is worse than no
@@ -57,7 +73,7 @@ export function Header({ locale }: { locale: Locale }) {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         e.preventDefault()
-        close()
+        close(true)
         return
       }
       if (e.key !== 'Tab') return
@@ -191,17 +207,6 @@ export function Header({ locale }: { locale: Locale }) {
                 </a>
               </li>
             ))}
-            {/* Points at the contact section, not Booking.com. Direct booking
-                is the goal, so the most prominent control on the page should
-                not hand the guest to a platform. */}
-            <li className="ml-2">
-              <a
-                href="#contact"
-                className="tap-target inline-flex cursor-pointer items-center rounded-sm border border-champagne px-5 text-sm font-medium text-sand transition-colors duration-200 hover:bg-champagne hover:text-espresso"
-              >
-                {d.nav.book}
-              </a>
-            </li>
             <li>
               <LocaleRule />
             </li>
@@ -260,7 +265,7 @@ export function Header({ locale }: { locale: Locale }) {
                 height={138}
                 className="h-8 w-auto"
               />
-              <MenuButton open label={d.menuClose} onClick={close} />
+              <MenuButton open label={d.menuClose} onClick={closeFromEvent} />
             </div>
 
             <nav
@@ -272,7 +277,7 @@ export function Header({ locale }: { locale: Locale }) {
                   <motion.li key={link.href} variants={itemVariants}>
                     <a
                       href={link.href}
-                      onClick={close}
+                      onClick={closeFromEvent}
                       className="block py-3 text-[clamp(2rem,9vw,2.75rem)] font-extralight leading-tight tracking-[-0.02em] text-sand transition-colors duration-200 hover:text-white"
                     >
                       {link.label}
@@ -281,20 +286,31 @@ export function Header({ locale }: { locale: Locale }) {
                 ))}
               </ul>
 
-              <motion.div variants={itemVariants} className="mt-12 space-y-3">
-                <a
-                  href="#contact"
-                  onClick={close}
-                  className="tap-target inline-flex w-full cursor-pointer items-center justify-center rounded-sm bg-sand px-6 text-sm font-medium text-espresso transition-colors duration-200 hover:bg-champagne"
-                >
-                  {d.nav.book}
-                </a>
+              {/* The same pair as the hero and the contact section, so the
+                  guest meets one set of controls everywhere. */}
+              <motion.div variants={itemVariants} className="mt-12 flex flex-wrap items-center gap-3">
                 <a
                   href={`tel:${site.contact.phone}`}
-                  onClick={close}
-                  className="tap-target inline-flex w-full cursor-pointer items-center justify-center rounded-sm border border-champagne px-6 text-sm font-medium text-sand transition-colors duration-200 hover:bg-champagne hover:text-espresso"
+                  onClick={closeFromEvent}
+                  className="tap-target inline-flex cursor-pointer items-center gap-3 rounded-sm bg-sand px-4 text-sm font-medium tracking-wide text-espresso transition-colors duration-200 hover:bg-champagne"
                 >
-                  {site.contact.phoneDisplay}
+                  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3.1 19.5 19.5 0 01-6-6A19.8 19.8 0 012.1 4.2 2 2 0 014.1 2h3a2 2 0 012 1.7c.1 1 .4 1.9.7 2.8a2 2 0 01-.5 2.1L8.1 9.9a16 16 0 006 6l1.3-1.2a2 2 0 012.1-.5c.9.3 1.8.6 2.8.7a2 2 0 011.7 2z" />
+                  </svg>
+                  {d.contact.callLabel}
+                </a>
+                <a
+                  href={waHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={closeFromEvent}
+                  className="tap-target inline-flex cursor-pointer items-center gap-3 rounded-sm border border-sand px-4 text-sm font-medium tracking-wide text-sand transition-colors duration-200 hover:bg-sand hover:text-espresso"
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                    <path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.87 9.87 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2Zm0 18.15h-.01a8.2 8.2 0 0 1-4.19-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.22 8.22 0 0 1-1.26-4.38c0-4.54 3.7-8.23 8.25-8.23 2.2 0 4.27.86 5.83 2.41a8.18 8.18 0 0 1 2.41 5.83c0 4.54-3.7 8.23-8.24 8.23Zm4.52-6.16c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.13-.16.24-.64.8-.78.97-.15.16-.29.18-.54.06-.25-.12-1.05-.39-1.99-1.23-.74-.66-1.23-1.47-1.38-1.72-.14-.25-.01-.38.11-.5.11-.11.25-.29.37-.44.12-.15.16-.25.25-.41.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.41-.42-.56-.43h-.48c-.17 0-.43.06-.66.31-.23.25-.86.85-.86 2.07 0 1.22.89 2.4 1.01 2.56.12.17 1.75 2.67 4.23 3.74.59.26 1.05.41 1.41.52.59.19 1.13.16 1.56.1.47-.07 1.47-.6 1.67-1.18.21-.58.21-1.07.15-1.18-.06-.1-.23-.16-.48-.29Z" />
+                  </svg>
+                  {d.contact.whatsappLabel}
+                  <span className="sr-only"> WhatsApp {d.opensNewTab}</span>
                 </a>
               </motion.div>
             </nav>
@@ -323,7 +339,7 @@ function MenuButton({
 }: {
   open: boolean
   label: string
-  onClick: () => void
+  onClick: (e: React.MouseEvent) => void
   ref?: React.Ref<HTMLButtonElement>
 }) {
   return (

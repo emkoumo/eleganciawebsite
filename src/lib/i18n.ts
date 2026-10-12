@@ -38,7 +38,7 @@ export type Dictionary = {
   menuClose: string
   menuTitle: string
   skipToMain: string
-  nav: { about: string; amenities: string; gallery: string; contact: string; book: string }
+  nav: { about: string; amenities: string; gallery: string; contact: string }
   opensNewTab: string
   /* Search-result description. Its own string rather than a join of hero
      fragments: it has to read as one sentence to a stranger who has not seen
@@ -97,7 +97,18 @@ export type Dictionary = {
     addressLabel: string
     responseNote: string
   }
-  footer: { stay: string; checkIn: string; checkOut: string; contact: string; rights: string }
+  footer: {
+    stay: string
+    checkIn: string
+    checkOut: string
+    contact: string
+    rights: string
+    /** Visible link text. Names the format, because a link that silently
+        downloads a file is a surprise worth avoiding. */
+    houseRules: string
+    /** Per-locale PDF. Drop the files in public/documents/. */
+    houseRulesPdf: string
+  }
   stayPolicy: string[]
   /* EU / ESPA co-funding banner. The artwork itself is localised — the
      publicity rules require the acknowledgement in the language the visitor is
@@ -117,7 +128,7 @@ const en: Dictionary = {
   menuClose: 'Close menu',
   menuTitle: 'Menu',
   skipToMain: 'Skip to main content',
-  nav: { about: 'About', amenities: 'Amenities', gallery: 'Gallery', contact: 'Contact', book: 'Book' },
+  nav: { about: 'About', amenities: 'Amenities', gallery: 'Gallery', contact: 'Contact' },
   opensNewTab: '(opens in a new tab)',
   metaDescription:
     'Three private villas on the slope between Mount Olympus and the Aegean, each with its own pool and hot tub, for up to six guests. Skotina, Pieria.',
@@ -250,6 +261,8 @@ const en: Dictionary = {
     checkOut: 'Check-out',
     contact: 'Contact',
     rights: 'All rights reserved.',
+    houseRules: 'House rules (PDF)',
+    houseRulesPdf: '/documents/house-rules-en.pdf',
   },
   stayPolicy: [
     'No smoking indoors',
@@ -276,7 +289,7 @@ const el: Dictionary = {
   menuClose: 'Κλείσιμο μενού',
   menuTitle: 'Μενού',
   skipToMain: 'Μετάβαση στο κύριο περιεχόμενο',
-  nav: { about: 'Το συγκρότημα', amenities: 'Παροχές', gallery: 'Φωτογραφίες', contact: 'Επικοινωνία', book: 'Κράτηση' },
+  nav: { about: 'Το συγκρότημα', amenities: 'Παροχές', gallery: 'Φωτογραφίες', contact: 'Επικοινωνία' },
   opensNewTab: '(ανοίγει σε νέα καρτέλα)',
   metaDescription:
     'Τρεις ιδιωτικές βίλες στην πλαγιά ανάμεσα στον Όλυμπο και το Αιγαίο, η καθεμιά με δική της πισίνα και υδρομασάζ, για έως έξι επισκέπτες. Σκοτίνα, Πιερία.',
@@ -404,6 +417,8 @@ const el: Dictionary = {
     checkOut: 'Check-out',
     contact: 'Επικοινωνία',
     rights: 'Με την επιφύλαξη παντός δικαιώματος.',
+    houseRules: 'Κανονισμός διαμονής (PDF)',
+    houseRulesPdf: '/documents/house-rules-el.pdf',
   },
   stayPolicy: [
     'Απαγορεύεται το κάπνισμα στους εσωτερικούς χώρους',

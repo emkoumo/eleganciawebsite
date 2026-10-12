@@ -46,7 +46,10 @@ export function EspaBanner({ locale }: { locale: Locale }) {
     /* Flush: no padding of its own, so the artwork's own white margin is the
        only breathing room and the strip is exactly as tall as the image. */
     <div className="border-b border-black bg-espresso">
-      <div className="mx-auto flex max-w-6xl justify-center sm:justify-start">
+      {/* Centred at every width — it is an acknowledgement, not a brand mark,
+          so it sits in the middle of its own strip rather than aligning to the
+          logo below it. */}
+      <div className="mx-auto flex max-w-6xl justify-center">
         <Image
           src={d.espa.src}
           alt={d.espa.alt}
