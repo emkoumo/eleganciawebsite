@@ -132,6 +132,45 @@
     min-width: 44px;
     min-height: 44px;
   }
+
+  /* -------------------------------------------------------------------------
+     Hero scrim relief
+     -------------------------------------------------------------------------
+     The hero's vertical scrim has to be heavy at the bottom, where the text
+     sits — but it was heavy across the FULL width, including the right third
+     where there is no text at all and nothing to protect. That buried the pool
+     and the architecture for no accessibility gain.
+
+     This masks the scrim's own alpha down on the right, so the photograph comes
+     back where it costs nothing. Masking rather than a second overlay because
+     you cannot lighten with an overlay — only a mask subtracts.
+
+     ONLY from lg up, and that restriction is the whole point. Below lg the
+     heading and subheading span essentially the full column width, so the right
+     side is exactly where the text is; lightening it there would strip contrast
+     from the words rather than from empty photograph. The hero's widest text
+     block is max-w-3xl, which ends around 63% of a 1440 viewport — the ramp
+     starts at 58% and only reaches full strength past that.
+
+     Figures are confirmed by the pixel sampler in scripts/a11y-audit.mjs, which
+     measures the real backdrop behind every hero text element at 1440x900.
+  ------------------------------------------------------------------------- */
+  @media (min-width: 1024px) {
+    .scrim-relief {
+      -webkit-mask-image: linear-gradient(
+        to right,
+        #000 0%,
+        #000 55%,
+        rgba(0, 0, 0, 0.15) 100%
+      );
+      mask-image: linear-gradient(
+        to right,
+        #000 0%,
+        #000 55%,
+        rgba(0, 0, 0, 0.15) 100%
+      );
+    }
+  }
 }
 
 /* ---------------------------------------------------------------------------

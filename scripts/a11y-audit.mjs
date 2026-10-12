@@ -156,8 +156,29 @@ async function samplePixelContrastOnce(page, sharp, selector) {
     const hb = document.querySelector('header')?.getBoundingClientRect()
     const top = hb && hb.top <= 0 && hb.bottom > 0 ? hb.bottom : 0
     const out = []
+    /* The GLYPHS' box, not the element's box.
+
+       A block element is as wide as its container whether or not its text
+       fills it. The hero eyebrow is a <p> about 230px of text wide sitting in
+       a 1152px block, so measuring el.getBoundingClientRect() sampled ~900px
+       of empty photograph to its right and failed on a bright pixel no letter
+       ever touches. A Range over the element's contents returns one rect per
+       rendered line, which hugs the text; their union is the area that
+       actually has to meet contrast. */
+    const glyphBox = (el) => {
+      const r = document.createRange()
+      r.selectNodeContents(el)
+      const rects = [...r.getClientRects()].filter((x) => x.width > 0 && x.height > 0)
+      if (!rects.length) return null
+      const left = Math.min(...rects.map((x) => x.left))
+      const right = Math.max(...rects.map((x) => x.right))
+      const topY = Math.min(...rects.map((x) => x.top))
+      const bottomY = Math.max(...rects.map((x) => x.bottom))
+      return { left, right, top: topY, bottom: bottomY, width: right - left, height: bottomY - topY }
+    }
+
     for (const el of hero.querySelectorAll('h1, h2, p, a')) {
-      const b = el.getBoundingClientRect()
+      const b = glyphBox(el) ?? el.getBoundingClientRect()
       if (b.width < 4 || b.height < 4) continue
       if (b.top < top || b.bottom > window.innerHeight) continue
       if (!el.textContent?.trim()) continue

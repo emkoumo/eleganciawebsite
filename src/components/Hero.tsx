@@ -80,10 +80,14 @@ export function Hero({ locale }: { locale: Locale }) {
 
         Champagne is still unsafe for small text anywhere over this scrim, so the
         eyebrow below is overridden to sand.
+
+        `scrim-relief` masks this gradient's own alpha down over the right third
+        from lg up, where there is no text to protect — see globals.css. Below
+        lg it does nothing, because at phone width the text IS the right third.
       */}
       <div
         aria-hidden="true"
-        className="absolute inset-0 -z-10 bg-[linear-gradient(to_top,rgba(31,27,23,0.82)_0%,rgba(31,27,23,0.78)_45%,rgba(31,27,23,0.68)_74%,rgba(31,27,23,0.30)_90%,rgba(31,27,23,0.08)_100%)]"
+        className="scrim-relief absolute inset-0 -z-10 bg-[linear-gradient(to_top,rgba(31,27,23,0.82)_0%,rgba(31,27,23,0.78)_45%,rgba(31,27,23,0.68)_74%,rgba(31,27,23,0.30)_90%,rgba(31,27,23,0.08)_100%)]"
       />
 
       {/*
