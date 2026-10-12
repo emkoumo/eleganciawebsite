@@ -61,12 +61,22 @@ export function Header({ locale }: { locale: Locale }) {
      every pairing resolves against a known opaque background:
      sand 12.97:1, champagne 5.62:1, white 12.63:1. */
   return (
-    <header className="on-dark fixed inset-x-0 top-0 z-40 border-b border-champagne/15 bg-espresso">
+    /*
+      `absolute`, not `fixed`: the header scrolls away with the page instead of
+      following it down, which is what was asked for.
+
+      Still taken out of flow rather than left static, and that is load-bearing.
+      It overlays the top of the hero, so header height + hero height is exactly
+      one viewport — the hero can simply be min-h-svh and there is no strip of
+      the next section showing under it. A static header would stack above the
+      hero and push 100svh of photograph partly below the fold, which is the gap
+      at the bottom of the screen this replaces. Doing that arithmetic in CSS
+      instead would mean hard-coding a header height that changes with the
+      banner's width at every breakpoint.
+    */
+    <header className="on-dark absolute inset-x-0 top-0 z-40 border-b border-champagne/15 bg-espresso">
       {/* EU/ESPA acknowledgement sits above the nav, inside the banner
-          landmark. It stays with the fixed header rather than scrolling away:
-          a static strip would need the header to become sticky, which pushes
-          the hero down out of the viewport and invalidates the measured
-          gradient scrim it relies on for text contrast. */}
+          landmark, so the whole dark block reads as one header. */}
       <EspaBanner locale={locale} />
 
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-6 py-4">

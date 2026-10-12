@@ -48,11 +48,11 @@
 @layer base {
   html {
     scroll-behavior: smooth;
-    /* Offset anchor targets so the fixed header never covers a heading.
-       Must clear the WHOLE fixed stack, which is the ESPA strip plus the nav
-       row: ~147px at desktop widths, ~131px on a phone. 10rem = 160px leaves a
-       little air above the heading at the taller of the two. */
-    scroll-padding-top: 10rem;
+    /* The header is absolutely positioned at the top of the document, not
+       fixed, so by the time any anchor target is reached it has scrolled out of
+       view and there is nothing to clear. This is now just breathing room above
+       a heading you have jumped to, rather than a header-height offset. */
+    scroll-padding-top: 2rem;
     -webkit-text-size-adjust: 100%;
   }
 

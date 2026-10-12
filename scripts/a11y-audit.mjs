@@ -126,12 +126,13 @@ async function scrollSectionIntoFrame(page, selector, align) {
   await page.evaluate(
     (sel, al) => {
       const el = document.querySelector(sel)
-      const header = document.querySelector('header')
-      const headerH = header ? header.getBoundingClientRect().height : 0
-      const top = el.getBoundingClientRect().top + window.scrollY
-      const height = el.getBoundingClientRect().height
+      const box = el.getBoundingClientRect()
+      const top = box.top + window.scrollY
       document.documentElement.style.scrollBehavior = 'auto'
-      const y = al === 'top' ? top - headerH - 8 : top + height - window.innerHeight + 8
+      /* No header-height offset: the header is absolute, so it only overlaps
+         the viewport at the very top of the document. Elements it does cover
+         are discarded by the occlusion test in the sampler instead. */
+      const y = al === 'top' ? top - 8 : top + box.height - window.innerHeight + 8
       window.scrollTo(0, Math.max(0, y))
     },
     selector,
@@ -148,8 +149,12 @@ async function samplePixelContrastOnce(page, sharp, selector) {
   const targets = await page.evaluate((sel) => {
     const hero = document.querySelector(sel)
     if (!hero) return []
-    const header = document.querySelector('header')
-    const top = header ? header.getBoundingClientRect().height : 0
+    /* Where the usable band starts. The header is absolute rather than fixed,
+       so it only hides anything while the page is scrolled to the very top —
+       measure the overlap instead of always subtracting its height, or every
+       section below the fold loses 147px of samplable area for no reason. */
+    const hb = document.querySelector('header')?.getBoundingClientRect()
+    const top = hb && hb.top <= 0 && hb.bottom > 0 ? hb.bottom : 0
     const out = []
     for (const el of hero.querySelectorAll('h1, h2, p, a')) {
       const b = el.getBoundingClientRect()

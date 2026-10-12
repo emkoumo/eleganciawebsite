@@ -27,21 +27,26 @@ import { getDictionary, type Locale } from '@/lib/i18n'
        page tells the visitor where it goes. The static image says everything
        the rule requires without that cost.
 
-     * Its own white background, because the artwork is drawn on white and the
-       header behind it is espresso. The strip is opaque so no text resolves
-       contrast against a see-through ancestor.
+     * The strip is espresso, matching the nav row below it, so the two read as
+       one header rather than a white bar stacked on a dark one. The artwork
+       keeps its own white ground because it is a JPEG with no alpha — and
+       because that is what the EU emblem guidance asks for: on a dark
+       background the emblem sits inside a white box rather than being
+       recoloured or knocked out. Nothing here is a contrast risk; the only
+       text is inside the image, carried by alt.
 
    Sizing is width-driven (`w-full max-w-[460px]`) rather than height-driven so
    the lockup never overflows a narrow phone: ~39px tall at 360px wide, ~54px
-   tall from the small breakpoint up. Anything taller starts eating the fixed
-   header's share of a short mobile viewport.
+   tall from the small breakpoint up.
 --------------------------------------------------------------------------- */
 export function EspaBanner({ locale }: { locale: Locale }) {
   const d = getDictionary(locale)
 
   return (
-    <div className="bg-white">
-      <div className="mx-auto flex max-w-6xl justify-center px-6 py-2 sm:justify-start">
+    /* Flush: no padding of its own, so the artwork's own white margin is the
+       only breathing room and the strip is exactly as tall as the image. */
+    <div className="border-b border-black bg-espresso">
+      <div className="mx-auto flex max-w-6xl justify-center sm:justify-start">
         <Image
           src={d.espa.src}
           alt={d.espa.alt}
