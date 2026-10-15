@@ -55,10 +55,12 @@ export const photos: Photo[] = raw.map((p) => {
 export const heroPhoto: Photo =
   photos.find((p) => p.hero) ?? photos[0]
 
-/* The gallery excludes only the hero, which is already the largest thing on the
-   page. It used to also exclude four material close-ups, which had their own
-   section; that section is gone, so those four are back in the grid. */
-export const galleryPhotos: Photo[] = photos.filter((p) => !p.hero)
+/* The gallery is now the whole set, hero included — it is photo 01 and leads
+   the grid. It previously excluded the hero on the grounds that it was already
+   the largest thing on the page, and before that four material close-ups which
+   had their own section. Both exclusions are gone, so the numbering in the
+   filenames is exactly the order on screen, with no gaps to explain. */
+export const galleryPhotos: Photo[] = photos
 
 export function photoSrc(photo: Photo): string {
   return `/images/gallery/${photo.file}`

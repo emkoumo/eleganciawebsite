@@ -106,7 +106,11 @@ export type Dictionary = {
     /** Visible link text. Names the format, because a link that silently
         downloads a file is a surprise worth avoiding. */
     houseRules: string
-    /** Per-locale PDF. Drop the files in public/documents/. */
+    /** Per-locale PDF in public/documents/rules/. Paths are deliberately
+        ASCII, lowercase and hyphenated: the uploads arrived as
+        "Stay Rules & Policies.pdf" and "Κανόνες & Πολιτικές Διαμονής.pdf",
+        which encode to unreadable URLs and, in the Greek case, 180 characters
+        of percent-escapes. */
     houseRulesPdf: string
   }
   /* EU / ESPA co-funding banner. The artwork itself is localised — the
@@ -261,7 +265,7 @@ const en: Dictionary = {
     contact: 'Contact',
     rights: 'All rights reserved.',
     houseRules: 'House rules (PDF)',
-    houseRulesPdf: '/documents/house-rules-en.pdf',
+    houseRulesPdf: '/documents/rules/house-rules-en.pdf',
   },
   espa: {
     src: '/images/espa/antagonistikotita-en.jpg',
@@ -411,7 +415,7 @@ const el: Dictionary = {
     contact: 'Επικοινωνία',
     rights: 'Με την επιφύλαξη παντός δικαιώματος.',
     houseRules: 'Κανονισμός διαμονής (PDF)',
-    houseRulesPdf: '/documents/house-rules-el.pdf',
+    houseRulesPdf: '/documents/rules/house-rules-el.pdf',
   },
   espa: {
     src: '/images/espa/antagonistikotita-el.jpg',
