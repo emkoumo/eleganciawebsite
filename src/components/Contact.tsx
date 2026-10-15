@@ -24,7 +24,7 @@ import { photos, photoSrc } from '@/lib/photos'
    against real rendered pixels by scripts/a11y-audit.mjs rather than guessed.
 --------------------------------------------------------------------------- */
 
-const BACKDROP = 'pool-night-lit.jpg'
+const BACKDROP = '04-pool-night-lit.jpg'
 
 export function Contact({ locale }: { locale: Locale }) {
   const d = getDictionary(locale)
